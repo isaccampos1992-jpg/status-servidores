@@ -353,6 +353,10 @@ td.m{font-family:var(--mono);font-size:11px}
             <div class="cc-hdr"><div><div class="cct">Adoção de I.A</div><div class="ccs">câmeras inteligentes</div></div></div>
             <div id="ci-wrap" style="position:relative;height:160px"><canvas id="ci"></canvas></div>
           </div>
+          <div class="cc">
+            <div class="cc-hdr"><div><div class="cct">Licenças Livres</div><div class="ccs">disponíveis por grupo</div></div></div>
+            <div id="lic-livres-box"></div>
+          </div>
         </div>
       </div>
 
@@ -612,6 +616,14 @@ function pb(p){
   return`<div class="pw"><div class="pb"><div class="pf" style="width:${Math.min(p,100)}%;background:${c}"></div></div><span class="pp" style="color:${c}">${p}%</span></div>`;
 }
 
+// Limpar dados de teste ao iniciar
+async function limparTeste(){
+  try{
+    const rows=await sbGet('servidores');
+    const teste=rows.filter(r=>r.servidor==='TESTE');
+    for(const r of teste){await sbDelete('servidores',r.id);}
+  }catch(e){}
+}
 async function login(){
   const u=gi('lu').value.trim(),p=gi('lp').value,e=gi('le');
   if(!u||!p){e.textContent='⚠ Preencha usuário e senha.';e.style.display='block';return;}
@@ -626,7 +638,10 @@ async function login(){
     gi('ls').style.display='none';gi('ls-bg').style.display='none';gi('ls-overlay').style.display='none';gi('app').classList.add('v');
     gi('unm-name').textContent=nome;gi('url-role').textContent=perfil;gi('uav-init').textContent=nome.charAt(0).toUpperCase();
     const nc=gi('nav-cfg');if(nc)nc.style.display=perfil==='admin'?'':'none';
-    showLoading('Carregando servidores...');S=await sbGet('servidores');sortS();hideLoading();
+    showLoading('Carregando servidores...');S=await sbGet('servidores');sortS();
+    await limparTeste();
+    S=S.filter(r=>r.servidor!=='TESTE');
+    hideLoading();
     renderAll();addAudit('Login realizado',nome+' ('+perfil+')','log');addAccessLog(nome,perfil,'entrada');
     toast('✓ Bem-vindo, '+nome+'!','ok');
   }catch(err){hideLoading();e.textContent='⚠ '+err.message;e.style.display='block';gi('lp').value='';}
@@ -780,7 +795,27 @@ function rDash(){
       <div class="status-item si-crit"><div class="si-label"><div class="si-dot" style="background:#EF4444"></div>Crítico</div><div><span class="si-val" style="color:#F87171">${nCri}</span><span class="si-pct">${pCri}%</span></div></div>
     </div>`;
 
-  // Chart 3: Donut IA
+  // Licenças livres por grupo
+  const licLivresTotal=d.reduce((a,s)=>a+s.l,0);
+  const licLivresImagem=d.filter(s=>s.servidor.toLowerCase().includes('sigma imagem')||s.servidor.toLowerCase().includes('svri')).reduce((a,s)=>a+s.l,0);
+  const licLivresGear=d.filter(s=>s.servidor.toLowerCase().includes('sigma gear')||s.servidor.toLowerCase().includes('svrg')).reduce((a,s)=>a+s.l,0);
+  const llBox=gi('lic-livres-box');
+  if(llBox)llBox.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:var(--t2);font-family:var(--mono)">Total Geral</span>
+        <span style="font-size:20px;font-weight:700;color:#34D399;font-family:var(--mono)">${licLivresTotal.toLocaleString('pt-BR')}</span>
+      </div>
+      <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:var(--t2);font-family:var(--mono)">Sigma Imagem</span>
+        <span style="font-size:18px;font-weight:700;color:var(--cy2);font-family:var(--mono)">${licLivresImagem.toLocaleString('pt-BR')}</span>
+      </div>
+      <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:var(--t2);font-family:var(--mono)">Sigma Gear</span>
+        <span style="font-size:18px;font-weight:700;color:var(--pu2);font-family:var(--mono)">${licLivresGear.toLocaleString('pt-BR')}</span>
+      </div>
+    </div>
+  `;
   const totIA=d.reduce((a,s)=>a+s.caia,0),totCam2=d.reduce((a,s)=>a+s.cam,0),pctIA=totCam2>0?Math.round(totIA/totCam2*100):0;
   CH.i=new Chart(gi('ci'),{
     type:'doughnut',
