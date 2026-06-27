@@ -726,24 +726,165 @@ function exportRedis(){
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Redistribuição');
   XLSX.writeFile(wb,`redistribuicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);toast('✓ Exportado!','ok');
 }
+// ═══ AQUISIÇÃO ═══
+let _acqMode=0; // 0=auto, 1=aleatorio, 2=manual
+let _acqPlan=[]; // plano atual
+
+function setAcqMode(m){
+  _acqMode=m;
+  for(let i=0;i<3;i++){const b=document.getElementById('acq-m'+i);if(b)b.className='btn bg';}
+  const mb=document.getElementById('acq-m'+m);if(mb)mb.className='btn bp';
+  calcAcq();
+}
+
 function calcAcq(){
-  const qtd=+document.getElementById('acq-qtd').value||0,preco=+document.getElementById('acq-preco').value||0,grupo=document.getElementById('acq-grupo').value;
+  const qtd=+document.getElementById('acq-qtd').value||0;
+  const preco=+document.getElementById('acq-preco').value||0;
+  const grupo=document.getElementById('acq-grupo').value;
+  const el=document.getElementById('acq-result');
+  const saveBar=document.getElementById('acq-save-bar');
+  if(!el)return;
+  if(!qtd){el.innerHTML='<div class="empty">Informe a quantidade de licenças a adquirir</div>';if(saveBar)saveBar.style.display='none';return;}
+
+  const d=getDv();
+  const pool=grupo==='total'?d:d.filter(s=>s.servidor.toLowerCase().includes(grupo));
+
+  // Fase 1: priorizar abaixo do ideal
+  const abaixo=[...pool].filter(s=>s.sg>0).sort((a,b)=>b.sg-a.sg);
+  const noIdeal=[...pool].filter(s=>s.sg<=0).sort((a,b)=>b.p-a.p);
+  const ordem=[...abaixo,...noIdeal];
+
+  let dist;
+
+  if(_acqMode===0){
+    // AUTOMÁTICO: preenche déficits primeiro, depois distribui igualmente
+    let rest=qtd;
+    dist=ordem.map(s=>{const nec=Math.max(0,s.sg);const rec=Math.min(nec,rest);rest=Math.max(0,rest-rec);return{...s,rec};});
+    // distribuir sobra igualmente
+    if(rest>0&&dist.length>0){const extra=Math.floor(rest/dist.length);const rem=rest%dist.length;dist.forEach((s,i)=>{s.rec+=extra+(i<rem?1:0);});}
+
+  }else if(_acqMode===1){
+    // ALEATÓRIO: déficits primeiro, depois aleatório nos demais
+    let rest=qtd;
+    dist=ordem.map(s=>({...s,rec:0}));
+    // primeiro zera déficits
+    dist.filter(s=>s.sg>0).forEach(s=>{const rec=Math.min(s.sg,rest);s.rec=rec;rest-=rec;});
+    // restante: distribui aleatoriamente
+    if(rest>0){
+      const disponiveis=dist.filter(s=>s.sg<=0);
+      if(disponiveis.length>0){
+        // gera pesos aleatórios
+        const pesos=disponiveis.map(()=>Math.random());
+        const total=pesos.reduce((a,b)=>a+b,0);
+        let alocado=0;
+        disponiveis.forEach((s,i)=>{
+          const rec=i===disponiveis.length-1?rest-alocado:Math.round((pesos[i]/total)*rest);
+          s.rec+=Math.max(0,rec);alocado+=Math.max(0,rec);
+        });
+      }else{
+        // todos abaixo do ideal — distribui aleatoriamente entre todos
+        const pesos=dist.map(()=>Math.random());
+        const total=pesos.reduce((a,b)=>a+b,0);
+        let alocado=0;
+        dist.forEach((s,i)=>{
+          const rec=i===dist.length-1?rest-alocado:Math.round((pesos[i]/total)*rest);
+          s.rec+=Math.max(0,rec);alocado+=Math.max(0,rec);
+        });
+      }
+    }
+
+  }else{
+    // MANUAL: campos editáveis
+    dist=ordem.map(s=>({...s,rec:Math.max(0,s.sg)})); // sugere déficit como default
+    // limitar ao total disponível — será validado no render
+  }
+
+  _acqPlan=dist.map(s=>({...s,nq:s.qtd+s.rec,np:(s.qtd+s.rec)>0?Math.round(s.util/(s.qtd+s.rec)*100):0}));
+  renderAcqTable(qtd,preco);
+  if(saveBar)saveBar.style.display=_acqPlan.filter(s=>s.rec>0).length>0?'block':'none';
+}
+
+function renderAcqTable(qtd,preco){
   const el=document.getElementById('acq-result');if(!el)return;
-  if(!qtd){el.innerHTML='<div class="empty">Informe a quantidade de licenças</div>';return;}
-  const d=getDv();const pool=grupo==='total'?d:d.filter(s=>s.servidor.toLowerCase().includes(grupo));
-  const pri=[...pool].sort((a,b)=>b.p-a.p);let rest=qtd;
-  const dist=pri.map(s=>{const nec=Math.max(0,s.sg);const rec=Math.min(nec,rest);rest=Math.max(0,rest-rec);return{...s,rec,nq:s.qtd+rec,np:(s.qtd+rec)>0?Math.round(s.util/(s.qtd+rec)*100):0};});
+  const totalRec=_acqPlan.reduce((a,s)=>a+s.rec,0);
+  const sobra=qtd-totalRec;
   const custo=preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'—';
-  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px"><div class="kc kc-1"><div class="ki">◉</div><div class="kl">A Adquirir</div><div class="kv" style="color:#22D3EE">${qtd}</div><div class="ks">licenças</div></div><div class="kc kc-3"><div class="ki">✓</div><div class="kl">Beneficiados</div><div class="kv" style="color:#34D399">${dist.filter(s=>s.rec>0).length}</div><div class="ks">servidores</div></div><div class="kc kc-2"><div class="ki">$</div><div class="kl">Custo Estimado</div><div class="kv" style="font-size:15px;color:#FCD34D">${custo}</div><div class="ks">${preco>0?'R$ '+preco.toFixed(2)+'/lic':'sem valor'}</div></div></div><div class="tc"><div class="th2"><div class="tt">Distribuição Sugerida</div></div><div class="tw"><table style="min-width:500px"><thead><tr><th>Servidor</th><th>Atual</th><th>Recebe</th><th>Novo Total</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead><tbody>${dist.map(s=>{const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';const cD=s.np>=90?'#EF4444':s.np>=70?'#F59E0B':'#10B981';return`<tr><td class="b">${s.servidor}</td><td class="m">${s.qtd}</td><td class="m" style="color:${s.rec>0?'#34D399':'var(--t3)'}">+${s.rec}</td><td class="m" style="color:var(--in3)">${s.nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${s.np}%</td></tr>`;}).join('')}</tbody></table></div></div>${rest>0?`<div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#FCD34D">⚠ ${rest} licença(s) não distribuída(s).</div>`:''}<div style="display:flex;justify-content:center;margin-top:14px"><button class="btn bp" onclick="exportAcq(${qtd},${preco},'${grupo}')">↓ Exportar</button></div>`;
+
+  const kpis=`<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px">
+    <div class="kc kc-1"><div class="ki">◉</div><div class="kl">A Adquirir</div><div class="kv" style="color:#22D3EE">${qtd}</div><div class="ks">licenças</div></div>
+    <div class="kc kc-3"><div class="ki">✓</div><div class="kl">Distribuídas</div><div class="kv" style="color:#34D399">${totalRec}</div><div class="ks">${_acqPlan.filter(s=>s.rec>0).length} servidores</div></div>
+    <div class="kc kc-${sobra>0?2:3}"><div class="ki">${sobra>0?'!':'✓'}</div><div class="kl">Não Alocadas</div><div class="kv" style="color:${sobra>0?'#FCD34D':'#34D399'}">${sobra}</div><div class="ks">${sobra>0?'a distribuir':'tudo alocado'}</div></div>
+    <div class="kc kc-2"><div class="ki">$</div><div class="kl">Custo Estimado</div><div class="kv" style="font-size:14px;color:#FCD34D">${custo}</div><div class="ks">${preco>0?'R$ '+preco.toFixed(2)+'/lic':'sem valor'}</div></div>
+  </div>`;
+
+  const rows=_acqPlan.map((s,idx)=>{
+    const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
+    const nq=s.qtd+s.rec;
+    const np=nq>0?Math.round(s.util/nq*100):0;
+    const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';
+    const tag=s.sg>0?`<span class="badge bgr" style="font-size:9px">Abaixo ideal</span>`:`<span class="badge bgg" style="font-size:9px">No/acima ideal</span>`;
+    const recCell=_acqMode===2
+      ?`<input type="number" value="${s.rec}" min="0" style="width:70px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:4px 8px;color:var(--t1);font-family:var(--mono);font-size:11px;outline:none;text-align:center" oninput="updateManual(${idx},this.value)">`
+      :`<span style="color:${s.rec>0?'#34D399':'var(--t3)'};font-family:var(--mono)">+${s.rec}</span>`;
+    return`<tr><td class="b">${s.servidor}</td><td>${tag}</td><td class="m">${s.qtd}</td><td>${recCell}</td><td class="m" style="color:var(--in3)">${nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;
+  }).join('');
+
+  el.innerHTML=kpis+`<div class="tc"><div class="th2"><div class="tt">Plano de Distribuição</div>${_acqMode===1?`<button class="btn bg" style="font-size:10px" onclick="calcAcq()">🎲 Redistribuir aleatório</button>`:''}</div><div class="tw"><table style="min-width:550px"><thead><tr><th>Servidor</th><th>Status</th><th>Atual</th><th>Recebe</th><th>Novo Total</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+  ${sobra>0&&_acqMode!==2?`<div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#FCD34D">⚠ ${sobra} licença(s) não alocada(s).</div>`:''}`;
 }
-function exportAcq(qtd,preco,grupo){
-  const now=new Date();const d=getDv();const pool=grupo==='total'?d:d.filter(s=>s.servidor.toLowerCase().includes(grupo));
-  const pri=[...pool].sort((a,b)=>b.p-a.p);let rest=qtd;
-  const dist=pri.map(s=>{const nec=Math.max(0,s.sg);const rec=Math.min(nec,rest);rest=Math.max(0,rest-rec);return{...s,rec,nq:s.qtd+rec,np:(s.qtd+rec)>0?Math.round(s.util/(s.qtd+rec)*100):0};});
-  const ws=XLSX.utils.aoa_to_sheet([['Aquisição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],['Licenças: '+qtd],['Custo: '+(preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'N/A')],[''],['Servidor','Atual','Recebe','Novo Total','Uso % Antes','Uso % Depois'],...dist.map(s=>[s.servidor,s.qtd,s.rec,s.nq,s.p+'%',s.np+'%'])]);
+
+function updateManual(idx,val){
+  if(_acqPlan[idx])_acqPlan[idx].rec=Math.max(0,+val||0);
+  const qtd=+document.getElementById('acq-qtd').value||0;
+  const preco=+document.getElementById('acq-preco').value||0;
+  const totalRec=_acqPlan.reduce((a,s)=>a+s.rec,0);
+  const sobra=qtd-totalRec;
+  // atualiza apenas os KPIs sem rerender a tabela (para não perder foco)
+  const saveBar=document.getElementById('acq-save-bar');
+  if(saveBar)saveBar.style.display=totalRec>0?'block':'none';
+}
+
+async function applyAcq(){
+  const plan=_acqPlan.filter(s=>s.rec>0);
+  if(!plan.length){toast('⚠ Nenhuma licença para distribuir.','warn');return;}
+  if(!confirm(`Aplicar distribuição para ${plan.length} servidor(es)? Isso atualizará os dados no banco.`))return;
+  showLoading('Aplicando distribuição...');
+  try{
+    for(const s of plan){
+      const novaQtd=s.qtd+s.rec;
+      await sbPatch('servidores',s.id,{qtd:novaQtd});
+      const idx=S.findIndex(x=>x.id===s.id);
+      if(idx>=0)S[idx]={...S[idx],qtd:novaQtd};
+    }
+    sortS();invDv();badge();
+    toast(`✓ ${plan.length} servidor(es) atualizados!`,'ok');
+    _acqPlan=[];
+    document.getElementById('acq-result').innerHTML='<div class="empty">Distribuição aplicada com sucesso! Dados atualizados.</div>';
+    document.getElementById('acq-save-bar').style.display='none';
+    rDash();
+  }catch(err){toast('⚠ '+err.message,'error');}
+  finally{hideLoading();}
+}
+
+function exportAcqPlan(){
+  const qtd=+document.getElementById('acq-qtd').value||0;
+  const preco=+document.getElementById('acq-preco').value||0;
+  const now=new Date();
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Plano de Aquisição — SRV Monitor'],
+    ['Gerado: '+now.toLocaleString('pt-BR')],
+    ['Licenças: '+qtd],
+    ['Custo: '+(preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'N/A')],
+    [''],
+    ['Servidor','Status','Qtd. Atual','Recebe','Novo Total','Uso % Antes','Uso % Depois'],
+    ..._acqPlan.map(s=>{const nq=s.qtd+s.rec;const np=nq>0?Math.round(s.util/nq*100):0;return[s.servidor,s.sg>0?'Abaixo do ideal':'No/acima do ideal',s.qtd,s.rec,nq,s.p+'%',np+'%'];})
+  ]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Aquisição');
-  XLSX.writeFile(wb,`aquisicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);toast('✓ Exportado!','ok');
+  XLSX.writeFile(wb,`aquisicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);
+  toast('✓ Exportado!','ok');
 }
+
+function exportAcq(qtd,preco,grupo){exportAcqPlan();}
 async function rProjHist(){
   const snaps=await loadSnaps();const el=document.getElementById('proj-hist-content');if(!el)return;
   if(!snaps.length){el.innerHTML='<div class="empty">Nenhum snapshot. Use "Salvar Snapshot" para registrar.</div>';return;}
