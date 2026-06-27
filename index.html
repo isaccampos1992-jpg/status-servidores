@@ -90,6 +90,8 @@ body::before{content:'';position:fixed;inset:0;opacity:0.02;pointer-events:none;
 .bs:hover{background:rgba(16,185,129,0.18)}
 .bd{background:rgba(239,68,68,0.08);color:var(--re3);border:1px solid rgba(239,68,68,0.18)}
 .bd:hover{background:rgba(239,68,68,0.16)}
+.bam{background:rgba(245,158,11,0.1);color:var(--am3);border:1px solid rgba(245,158,11,0.2)}
+.bam:hover{background:rgba(245,158,11,0.18)}
 
 .kg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}
 .kc{border-radius:14px;padding:16px 14px;position:relative;overflow:hidden;transition:all 0.2s}
@@ -223,6 +225,36 @@ td.m{font-family:var(--mono);font-size:11px}
 .stitle{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:14px;font-family:var(--mono)}
 .div2{border:none;border-top:1px solid var(--b1);margin:14px 0}
 .empty{text-align:center;padding:28px;color:var(--t3);font-family:var(--mono);font-size:12px}
+
+/* === REDISTRIBUIÇÃO MÚLTIPLA === */
+.srv-select-list{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:280px;overflow-y:auto;padding:4px}
+.srv-check-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:9px;border:1px solid var(--b1);background:var(--s2);cursor:pointer;transition:all 0.15s;user-select:none}
+.srv-check-item:hover{border-color:var(--b2)}
+.srv-check-item.selected{border-color:var(--in2);background:rgba(79,70,229,0.1)}
+.srv-check-item input[type=checkbox]{accent-color:var(--in2);width:14px;height:14px;cursor:pointer}
+.srv-check-label{font-size:11px;font-family:var(--mono);color:var(--t1);flex:1}
+.srv-check-meta{font-size:10px;font-family:var(--mono);color:var(--t3)}
+
+/* === MODO BOTÕES AQUISIÇÃO === */
+.mode-btn-group{display:flex;gap:4px;background:var(--s2);padding:4px;border-radius:10px;border:1px solid var(--b1);width:fit-content;margin-bottom:16px}
+.mode-btn{padding:7px 16px;border-radius:7px;font-size:11px;font-family:var(--mono);font-weight:600;cursor:pointer;border:none;color:var(--t3);background:transparent;transition:all 0.15s}
+.mode-btn:hover{color:var(--t2)}
+.mode-btn.a{background:var(--s1);color:var(--in3);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+
+/* === BOTÃO SALVAR FLUTUANTE === */
+.save-bar{position:sticky;bottom:0;left:0;right:0;background:rgba(8,12,21,0.95);border-top:1px solid var(--b2);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(20px);z-index:100;border-radius:0 0 14px 14px;margin-top:16px}
+.save-bar-info{font-size:11px;font-family:var(--mono);color:var(--t2)}
+.save-bar-info strong{color:var(--in3)}
+
+/* === HISTÓRICO === */
+.hist-entry{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(79,70,229,0.05)}
+.hist-entry:last-child{border:none}
+.hist-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.hist-ins{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)}
+.hist-upd{background:rgba(79,70,229,0.1);border:1px solid rgba(79,70,229,0.2)}
+.hist-del{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2)}
+.hist-sys{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2)}
+
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(79,70,229,0.2);border-radius:2px}
@@ -237,7 +269,7 @@ td.m{font-family:var(--mono);font-size:11px}
     <div class="lb-logo">
       <div class="lb-icon">⬡</div>
       <div class="lb-title">Status de Servidores</div>
-      <div class="lb-sub">// SISTEMA DE GESTÃO v2.1</div>
+      <div class="lb-sub">// SISTEMA DE GESTÃO v3.0</div>
     </div>
     <div class="lf"><label>Usuário</label><input type="text" id="lu" placeholder="admin" onkeydown="if(event.key==='Enter')login()"></div>
     <div class="lf"><label>Senha</label><input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
@@ -354,6 +386,8 @@ td.m{font-family:var(--mono);font-size:11px}
           <button onclick="showProjTab(2)" id="pb2" class="btn bg" style="font-size:11px">Aquisição</button>
           <button onclick="showProjTab(3)" id="pb3" class="btn bg" style="font-size:11px">Histórico</button>
         </div>
+
+        <!-- CENÁRIO ATUAL -->
         <div id="psec-0">
           <div style="display:flex;gap:6px;margin-bottom:14px">
             <button onclick="fExceed('total',0)" id="pf0" class="btn bp" style="font-size:11px">Total</button>
@@ -363,37 +397,117 @@ td.m{font-family:var(--mono);font-size:11px}
           <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px" id="proj-dash"></div>
           <div class="pjg" id="pjg"></div>
         </div>
+
+        <!-- REDISTRIBUIÇÃO MÚLTIPLA -->
         <div id="psec-1" style="display:none">
-          <div class="sec-hdr"><div><div class="sec-title">Simulador de Redistribuição</div><div class="sec-sub">mova licenças entre servidores e veja o impacto</div></div></div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:16px">
-            <div class="cc"><div class="cct" style="margin-bottom:12px">Origem (excedente)</div><select class="fi" id="redis-origem" style="width:100%;margin-bottom:10px" onchange="calcRedis()"><option value="">Selecione...</option></select><div id="redis-origem-info"></div></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:40px">
-              <div style="font-size:22px;color:var(--in3)">→</div>
-              <div><label style="font-size:10px;color:var(--t3);font-family:var(--mono);display:block;margin-bottom:5px">Qtd. a mover</label><input type="number" id="redis-qtd" class="fi" style="width:90px;text-align:center" placeholder="0" min="1" oninput="calcRedis()"></div>
+          <div class="sec-hdr">
+            <div><div class="sec-title">Redistribuição de Licenças</div><div class="sec-sub">selecione múltiplos servidores de origem e destino</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bg" onclick="resetRedis()">✕ Limpar</button>
+              <button class="btn bg" onclick="exportRedis()">↓ Exportar</button>
+              <button class="btn bs" id="redis-save-btn" onclick="applyRedis()" style="display:none">💾 Salvar Redistribuição</button>
             </div>
-            <div class="cc"><div class="cct" style="margin-bottom:12px">Destino (déficit)</div><select class="fi" id="redis-destino" style="width:100%;margin-bottom:10px" onchange="calcRedis()"><option value="">Selecione...</option></select><div id="redis-destino-info"></div></div>
           </div>
+
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:16px">
+            <!-- ORIGENS -->
+            <div class="cc">
+              <div class="cct" style="margin-bottom:6px">📤 Origens (excedente)</div>
+              <div class="ccs" style="margin-bottom:10px">Servidores com licenças acima do ideal</div>
+              <div class="srv-select-list" id="redis-origens-list"></div>
+              <div style="margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:8px;font-size:10px;font-family:var(--mono);color:var(--t3)">
+                Excedente total disponível: <strong id="redis-exc-total" style="color:var(--in3)">0</strong> licenças
+              </div>
+            </div>
+
+            <!-- CONTROLE CENTRAL -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:30px;min-width:160px">
+              <div style="font-size:26px;color:var(--in3)">⇄</div>
+              <div style="width:100%">
+                <label style="font-size:10px;color:var(--t3);font-family:var(--mono);display:block;margin-bottom:5px">Total a redistribuir</label>
+                <input type="number" id="redis-qtd-total" class="fi" style="width:100%;text-align:center" placeholder="0" min="1" oninput="calcRedisMulti()">
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:10px;width:100%;text-align:center">
+                <div style="font-size:9px;color:var(--t3);font-family:var(--mono);margin-bottom:4px">DISTRIBUIÇÃO</div>
+                <div style="font-size:11px;color:var(--in3);font-family:var(--mono)" id="redis-mode-info">Proporcional ao déficit</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--t2);font-family:var(--mono)">
+                <input type="checkbox" id="redis-allow-dup" onchange="calcRedisMulti()" style="accent-color:var(--in2)"> Permitir duplicação
+              </label>
+            </div>
+
+            <!-- DESTINOS -->
+            <div class="cc">
+              <div class="cct" style="margin-bottom:6px">📥 Destinos (déficit)</div>
+              <div class="ccs" style="margin-bottom:10px">Servidores abaixo do ideal</div>
+              <div class="srv-select-list" id="redis-destinos-list"></div>
+              <div style="margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:8px;font-size:10px;font-family:var(--mono);color:var(--t3)">
+                Déficit total selecionado: <strong id="redis-def-total" style="color:var(--re3)">0</strong> licenças
+              </div>
+            </div>
+          </div>
+
+          <!-- PREVIEW REDISTRIBUIÇÃO -->
           <div id="redis-preview" style="display:none">
-            <div class="cc" style="margin-bottom:12px"><div class="cct" style="margin-bottom:14px">Antes × Depois</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="redis-ba"></div></div>
-            <div style="display:flex;justify-content:center;gap:10px;margin-top:10px"><button class="btn bg" onclick="resetRedis()">✕ Limpar</button><button class="btn bp" onclick="exportRedis()">↓ Exportar</button></div>
+            <div class="cc" style="margin-bottom:12px">
+              <div class="cct" style="margin-bottom:14px">Plano de Redistribuição</div>
+              <div id="redis-plan-table"></div>
+            </div>
           </div>
-          <div id="redis-empty" class="empty">Selecione origem, destino e quantidade para simular</div>
+          <div id="redis-empty" class="empty">Selecione origens, destinos e quantidade para simular</div>
         </div>
+
+        <!-- AQUISIÇÃO -->
         <div id="psec-2" style="display:none">
-          <div class="sec-hdr"><div><div class="sec-title">Simulador de Aquisição</div><div class="sec-sub">simule a compra de licenças e veja a distribuição sugerida</div></div></div>
+          <div class="sec-hdr">
+            <div><div class="sec-title">Simulador de Aquisição</div><div class="sec-sub">simule compra e veja a distribuição sugerida</div></div>
+          </div>
+
+          <!-- MODO DE DISTRIBUIÇÃO -->
+          <div style="margin-bottom:16px">
+            <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:8px;letter-spacing:1px">MODO DE DISTRIBUIÇÃO</div>
+            <div class="mode-btn-group">
+              <button class="mode-btn a" id="acq-m0" onclick="setAcqMode(0)">🤖 Automático</button>
+              <button class="mode-btn" id="acq-m1" onclick="setAcqMode(1)">🎲 Aleatório</button>
+              <button class="mode-btn" id="acq-m2" onclick="setAcqMode(2)">✏️ Manual</button>
+            </div>
+            <div id="acq-mode-desc" style="font-size:11px;color:var(--t3);font-family:var(--mono);padding:8px 12px;background:var(--s2);border-radius:8px;border:1px solid var(--b1)">
+              Prioriza servidores abaixo do ideal, depois distribui igualmente o restante.
+            </div>
+          </div>
+
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
             <div class="cc"><div class="cct" style="margin-bottom:10px">Licenças a Adquirir</div><input type="number" id="acq-qtd" class="fi" style="width:100%" placeholder="Ex: 100" min="1" oninput="calcAcq()"></div>
             <div class="cc"><div class="cct" style="margin-bottom:10px">Valor por Licença (R$)</div><input type="number" id="acq-preco" class="fi" style="width:100%" placeholder="Ex: 50,00" min="0" step="0.01" oninput="calcAcq()"></div>
             <div class="cc"><div class="cct" style="margin-bottom:10px">Priorizar grupo</div><select id="acq-grupo" class="fi" style="width:100%" onchange="calcAcq()"><option value="total">Todos</option><option value="sigma imagem">Sigma Imagem</option><option value="sigma gear">Sigma Gear</option></select></div>
           </div>
           <div id="acq-result"><div class="empty">Informe a quantidade de licenças a adquirir</div></div>
+          <!-- Barra de salvar aquisição -->
+          <div id="acq-save-bar" style="display:none" class="save-bar">
+            <div class="save-bar-info">Plano pronto: <strong id="acq-save-info">0 servidores</strong> serão atualizados</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bg" onclick="exportAcqPlan()">↓ Exportar</button>
+              <button class="btn bs" onclick="applyAcq()">💾 Salvar no banco</button>
+            </div>
+          </div>
         </div>
+
+        <!-- HISTÓRICO -->
         <div id="psec-3" style="display:none">
           <div class="sec-hdr">
-            <div><div class="sec-title">Cenários Salvos</div><div class="sec-sub">snapshots do estado dos servidores</div></div>
-            <div style="display:flex;gap:8px"><button class="btn bs" onclick="saveSnapshot()">📸 Salvar Snapshot</button><button class="btn bg" onclick="clearSnapshots()">🗑 Limpar</button><button class="btn bp" onclick="exportRelXlsx()">↓ Exportar</button></div>
+            <div><div class="sec-title">Histórico de Mudanças</div><div class="sec-sub">todas as alterações registradas no sistema</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bs" onclick="saveSnapshot()">📸 Salvar Snapshot</button>
+              <button class="btn bg" onclick="clearSnapshots()">🗑 Limpar Snapshots</button>
+              <button class="btn bp" onclick="exportRelXlsx()">↓ Exportar</button>
+            </div>
           </div>
-          <div id="proj-hist-content"></div>
+          <div style="display:flex;gap:3px;margin-bottom:14px;background:var(--s2);padding:3px;border-radius:9px;width:fit-content;border:1px solid var(--b1)">
+            <button id="hb0" class="btn bp" style="font-size:11px" onclick="showHistTab(0)">📸 Snapshots</button>
+            <button id="hb1" class="btn bg" style="font-size:11px" onclick="showHistTab(1)">📋 Auditoria</button>
+          </div>
+          <div id="hist-snaps"><div class="empty">Carregando...</div></div>
+          <div id="hist-audit" style="display:none"><div class="empty">Carregando...</div></div>
         </div>
       </div>
 
@@ -455,7 +569,7 @@ td.m{font-family:var(--mono);font-size:11px}
           <div class="cfg-grid">
             <div class="cfg-card"><div class="cfg-title">Informações</div>
               <table style="width:100%;font-size:12px;min-width:0">
-                <tr><td style="color:var(--t3);padding:5px 0">Versão</td><td style="text-align:right;font-family:var(--mono);color:var(--t1)">v2.1.0</td></tr>
+                <tr><td style="color:var(--t3);padding:5px 0">Versão</td><td style="text-align:right;font-family:var(--mono);color:var(--t1)">v3.0.0</td></tr>
                 <tr><td style="color:var(--t3);padding:5px 0">Banco</td><td style="text-align:right"><span class="badge bgp">Supabase</span></td></tr>
                 <tr><td style="color:var(--t3);padding:5px 0">Servidores</td><td style="text-align:right;font-family:var(--mono);color:var(--in3)" id="at">0</td></tr>
                 <tr><td style="color:var(--t3);padding:5px 0">Críticos</td><td style="text-align:right;font-family:var(--mono);color:#F87171" id="ac">0</td></tr>
@@ -548,6 +662,7 @@ async function sbDeleteAll(t){const r=await sbF(SB_URL+'/rest/v1/'+t+'?id=gte.0'
 async function sbPostMany(t,list){const r=await sbF(SB_URL+'/rest/v1/'+t,{method:'POST',body:JSON.stringify(list)});if(!r.ok)throw new Error('Erro importar: '+r.status);return r.json();}
 
 let S=[],CH={},IMP=[],_usersCache=null,_snapCache=null,_dvCache=null,_excFilter='total',_srvFilter='total',_srvView='cards';
+let _acqMode=0,_acqPlan=[];
 const gi=id=>document.getElementById(id);
 function sortS(){S.sort((a,b)=>a.servidor.localeCompare(b.servidor,'pt-BR',{sensitivity:'base'}));}
 function abr(n){return n.replace(/sigma\s*imagem\s*/i,'SVRI ').replace(/sigma\s*gear\s*/i,'SVRG ').trim();}
@@ -560,6 +675,11 @@ function sbadge(s){if(s==='Crítico')return`<span class="badge bgr"><span class=
 function showLoading(msg){let el=gi('sb-loading');if(!el){el=document.createElement('div');el.id='sb-loading';el.style.cssText='position:fixed;inset:0;background:rgba(5,8,16,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;gap:16px;backdrop-filter:blur(12px)';el.innerHTML='<div style="width:34px;height:34px;border:2px solid rgba(79,70,229,0.2);border-top-color:#6366F1;border-radius:50%;animation:spin 0.7s linear infinite"></div><div id="sb-lmsg" style="color:#8892B0;font-size:11px;font-family:JetBrains Mono,monospace;letter-spacing:2px"></div>';document.body.appendChild(el);}const m=gi('sb-lmsg');if(m)m.textContent=(msg||'CARREGANDO...').toUpperCase();el.style.display='flex';}
 function hideLoading(){const el=gi('sb-loading');if(el)el.style.display='none';}
 function toast(m,t){const c=t==='error'?'#EF4444':t==='warn'?'#F59E0B':'#10B981';const d=document.createElement('div');d.style.cssText=`position:fixed;bottom:22px;right:22px;background:#080C15;border:1px solid ${c};color:${c};padding:11px 18px;border-radius:12px;font-size:12px;z-index:9999;max-width:320px;font-family:JetBrains Mono,monospace;box-shadow:0 10px 40px rgba(0,0,0,0.7)`;d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3200);}
+
+// ═══ AUDITORIA ═══
+function addAudit(acao,detalhe,tipo='upd'){
+  sbPost('auditoria',{acao,detalhe:detalhe||'',tipo,usuario:(window.CU&&window.CU.nome)||'Sistema'}).catch(()=>{});
+}
 
 async function login(){
   const u=gi('lu').value.trim(),p=gi('lp').value,e=gi('le');
@@ -580,11 +700,12 @@ async function login(){
     for(const r of testes){try{await sbDelete('servidores',r.id);}catch(e){}}
     S=S.filter(r=>r.servidor!=='TESTE');
     sortS();invDv();hideLoading();rDash();addAccessLog(nome,perfil,'entrada');
+    addAudit('Login','Usuário '+nome+' entrou no sistema','log');
     toast('✓ Bem-vindo, '+nome+'!','ok');
   }catch(err){hideLoading();e.textContent='⚠ '+err.message;e.style.display='block';gi('lp').value='';}
   finally{if(btn){btn.textContent='Entrar no sistema →';btn.disabled=false;}}
 }
-function logout(){if(!confirm('Deseja sair?'))return;if(window.CU)addAccessLog(window.CU.nome,window.CU.perfil,'saída');window.CU=null;S=[];invDv();_usersCache=null;_snapCache=null;gi('app').classList.remove('v');gi('ls').style.display='flex';gi('lu').value='';gi('lp').value='';gi('le').style.display='none';destroyCharts();}
+function logout(){if(!confirm('Deseja sair?'))return;if(window.CU){addAccessLog(window.CU.nome,window.CU.perfil,'saída');addAudit('Logout','Usuário '+window.CU.nome+' saiu do sistema','log');}window.CU=null;S=[];invDv();_usersCache=null;_snapCache=null;gi('app').classList.remove('v');gi('ls').style.display='flex';gi('lu').value='';gi('lp').value='';gi('le').style.display='none';destroyCharts();}
 
 function go(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('a'));
@@ -652,37 +773,30 @@ function rSrv(f=''){
 // ═══ PROJEÇÕES ═══
 function showProjTab(idx){
   for(let i=0;i<4;i++){
-    const sec=document.getElementById('psec-'+i);
-    const btn=document.getElementById('pb'+i);
+    const sec=gi('psec-'+i);const btn=gi('pb'+i);
     if(sec)sec.style.display=i===idx?'block':'none';
     if(btn)btn.className=i===idx?'btn bp':'btn bg';
   }
   if(idx===0)rProjCenario();
-  else if(idx===1)initRedis();
-  else if(idx===2)calcAcq();
+  else if(idx===1)initRedisMulti();
+  else if(idx===2){calcAcq();}
   else if(idx===3)rProjHist();
 }
-function fExceed(f,fi){
-  _excFilter=f;
-  for(let i=0;i<3;i++){const b=document.getElementById('pf'+i);if(b)b.className='btn bg';}
-  const fb=document.getElementById('pf'+fi);if(fb)fb.className='btn bp';
-  rProjCenario();
-}
+function fExceed(f,fi){_excFilter=f;for(let i=0;i<3;i++){const b=gi('pf'+i);if(b)b.className='btn bg';}const fb=gi('pf'+fi);if(fb)fb.className='btn bp';rProjCenario();}
 function rProjDash(){
   const d=getDv();
   const fl=_excFilter==='total'?d:d.filter(s=>s.servidor.toLowerCase().includes(_excFilter));
   const falt=fl.filter(s=>s.ideal>s.qtd),totF=falt.reduce((a,s)=>a+(s.ideal-s.qtd),0);
-  const acima=fl.filter(s=>s.util>s.ideal);
-  const noId=fl.filter(s=>s.util<=s.ideal);
+  const acima=fl.filter(s=>s.util>s.ideal);const noId=fl.filter(s=>s.util<=s.ideal);
   const exc=fl.filter(s=>s.qtd>s.ideal),totE=exc.reduce((a,s)=>a+(s.qtd-s.ideal),0);
   const alerta=falt.length>0?`<div style="grid-column:1/-1;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:12px 16px"><div style="font-size:10px;color:#F87171;font-family:var(--mono);margin-bottom:8px">⚠ LICENÇAS INSUFICIENTES</div><div style="display:flex;flex-wrap:wrap;gap:6px">${falt.map(s=>`<span style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:3px 11px;font-size:11px;font-family:var(--mono);color:#F87171">${s.servidor} <strong style="color:#fff">+${s.ideal-s.qtd}</strong></span>`).join('')}</div></div>`:'';
-  const el=document.getElementById('proj-dash');if(!el)return;
+  const el=gi('proj-dash');if(!el)return;
   el.innerHTML=`<div class="kc kc-2"><div class="ki">!</div><div class="kl">Licenças Faltando</div><div class="kv" style="color:#FCD34D">+${totF}</div><div class="ks">${falt.length} servidor(es)</div></div><div class="kc kc-0"><div class="ki">▲</div><div class="kl">Acima do Ideal</div><div class="kv" style="color:#F87171">${acima.length}</div><div class="ks">util. &gt; ideal</div></div><div class="kc kc-3"><div class="ki">✓</div><div class="kl">Dentro do Ideal</div><div class="kv" style="color:#34D399">${noId.length}</div><div class="ks">util. ≤ ideal</div></div><div class="kc kc-5"><div class="ki">−</div><div class="kl">Total Excedentes</div><div class="kv" style="color:#A78BFA">${totE}</div><div class="ks">${exc.length} servidor(es)</div></div>${alerta}`;
 }
 function rProjCenario(){
   rProjDash();
   const fl=_excFilter==='total'?getDv():getDv().filter(s=>s.servidor.toLowerCase().includes(_excFilter));
-  const el=document.getElementById('pjg');if(!el)return;
+  const el=gi('pjg');if(!el)return;
   el.innerHTML=fl.map(s=>{
     const cl=s.sg>0?'pje':s.sg<0?'pjw':'pjo',ic=s.sg>0?'🔴':s.sg<0?'🟡':'🟢';
     const mg=s.sg>0?`Solicitar +${s.sg} licenças`:s.sg<0?`Excedente de ${Math.abs(s.sg)}`:'Capacidade ideal';
@@ -690,66 +804,213 @@ function rProjCenario(){
   }).join('')||`<p class="empty">Nenhum servidor.</p>`;
 }
 
-function initRedis(){
+// ═══ REDISTRIBUIÇÃO MÚLTIPLA ═══
+let _redisOrigens=new Set(),_redisDestinos=new Set();
+
+function initRedisMulti(){
   const d=getDv();
-  const s1=document.getElementById('redis-origem'),s2=document.getElementById('redis-destino');if(!s1||!s2)return;
-  const exc=d.filter(s=>s.sg<0).sort((a,b)=>a.sg-b.sg);
+  _redisOrigens=new Set();_redisDestinos=new Set();
+
+  // Origens: servidores com excedente (qtd > ideal)
+  const exc=d.filter(s=>s.sg<0).sort((a,b)=>a.sg-b.sg); // sg negativo = excedente
+  // Destinos: servidores abaixo do ideal (sg > 0)
   const def=d.filter(s=>s.sg>0).sort((a,b)=>b.sg-a.sg);
-  s1.innerHTML='<option value="">Selecione...</option>'+exc.map(s=>`<option value="${s.id}">${s.servidor} (exc: ${Math.abs(s.sg)})</option>`).join('');
-  s2.innerHTML='<option value="">Selecione...</option>'+def.map(s=>`<option value="${s.id}">${s.servidor} (falta: ${s.sg})</option>`).join('');
-  const qEl=document.getElementById('redis-qtd');if(qEl)qEl.value='';
-  const prev=document.getElementById('redis-preview');if(prev)prev.style.display='none';
-  const emp=document.getElementById('redis-empty');if(emp)emp.style.display='block';
-  const oi=document.getElementById('redis-origem-info');if(oi)oi.innerHTML='';
-  const di=document.getElementById('redis-destino-info');if(di)di.innerHTML='';
+
+  const listO=gi('redis-origens-list');
+  const listD=gi('redis-destinos-list');
+  if(!listO||!listD)return;
+
+  listO.innerHTML=exc.length?exc.map(s=>`
+    <div class="srv-check-item" id="ori-${s.id}" onclick="toggleRedisOri(${s.id})">
+      <input type="checkbox" id="chk-ori-${s.id}" onclick="event.stopPropagation();toggleRedisOri(${s.id})">
+      <div style="flex:1">
+        <div class="srv-check-label">${s.servidor}</div>
+        <div class="srv-check-meta">Excedente: <span style="color:#A78BFA">+${Math.abs(s.sg)}</span> | Livres: ${s.l}</div>
+      </div>
+    </div>`).join(''):
+    `<div class="empty" style="padding:16px">Nenhum servidor com excedente</div>`;
+
+  listD.innerHTML=def.length?def.map(s=>`
+    <div class="srv-check-item" id="dst-${s.id}" onclick="toggleRedisDst(${s.id})">
+      <input type="checkbox" id="chk-dst-${s.id}" onclick="event.stopPropagation();toggleRedisDst(${s.id})">
+      <div style="flex:1">
+        <div class="srv-check-label">${s.servidor}</div>
+        <div class="srv-check-meta">Déficit: <span style="color:#F87171">-${s.sg}</span> | Util: ${s.p}%</div>
+      </div>
+    </div>`).join(''):
+    `<div class="empty" style="padding:16px">Nenhum servidor com déficit</div>`;
+
+  const qtdEl=gi('redis-qtd-total');if(qtdEl)qtdEl.value='';
+  gi('redis-preview').style.display='none';
+  gi('redis-empty').style.display='block';
+  const sb=gi('redis-save-btn');if(sb)sb.style.display='none';
+  updateRedisTotals();
 }
-function redisInfo(s){return s?`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px;font-size:11px;font-family:var(--mono)"><div style="color:var(--t1);font-weight:600;margin-bottom:6px">${s.servidor}</div><div style="color:var(--t2)">Licenças: <strong style="color:var(--t1)">${s.qtd}</strong></div><div style="color:var(--t2)">Livres: <strong style="color:#34D399">${s.l}</strong></div><div style="color:var(--t2)">Excedente: <strong style="color:#A78BFA">${Math.abs(s.sg)}</strong></div></div>`:'';}
-function calcRedis(){
+
+function toggleRedisOri(id){
+  if(_redisOrigens.has(id))_redisOrigens.delete(id);
+  else _redisOrigens.add(id);
+  const el=gi('ori-'+id);const chk=gi('chk-ori-'+id);
+  if(el)el.classList.toggle('selected',_redisOrigens.has(id));
+  if(chk)chk.checked=_redisOrigens.has(id);
+  updateRedisTotals();calcRedisMulti();
+}
+function toggleRedisDst(id){
+  if(_redisDestinos.has(id))_redisDestinos.delete(id);
+  else _redisDestinos.add(id);
+  const el=gi('dst-'+id);const chk=gi('chk-dst-'+id);
+  if(el)el.classList.toggle('selected',_redisDestinos.has(id));
+  if(chk)chk.checked=_redisDestinos.has(id);
+  updateRedisTotals();calcRedisMulti();
+}
+function updateRedisTotals(){
   const d=getDv();
-  const oId=document.getElementById('redis-origem').value,dId=document.getElementById('redis-destino').value,qtd=+document.getElementById('redis-qtd').value||0;
-  const o=d.find(s=>s.id==oId),dst=d.find(s=>s.id==dId);
-  const oi=document.getElementById('redis-origem-info');if(oi)oi.innerHTML=redisInfo(o);
-  const di=document.getElementById('redis-destino-info');if(di)di.innerHTML=redisInfo(dst);
-  const prev=document.getElementById('redis-preview'),emp=document.getElementById('redis-empty');
-  if(!o||!dst||qtd<=0){if(prev)prev.style.display='none';if(emp)emp.style.display='block';return;}
-  if(prev)prev.style.display='block';if(emp)emp.style.display='none';
-  const card=(s,nq,label)=>{const pA=s.p,pD=nq>0?Math.round(s.util/nq*100):0;const cA=pA>=90?'#EF4444':pA>=70?'#F59E0B':'#10B981';const cD=pD>=90?'#EF4444':pD>=70?'#F59E0B':'#10B981';return`<div><div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:8px">${label}</div><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center"><div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:4px">ANTES</div><div style="font-size:18px;font-weight:700;color:${cA};font-family:var(--mono)">${pA}%</div><div style="font-size:10px;color:var(--t3)">${s.qtd} lic</div></div><span style="color:var(--in3)">→</span><div style="background:var(--s2);border:1px solid rgba(79,70,229,0.3);border-radius:9px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--in3);font-family:var(--mono);margin-bottom:4px">DEPOIS</div><div style="font-size:18px;font-weight:700;color:${cD};font-family:var(--mono)">${pD}%</div><div style="font-size:10px;color:var(--t3)">${nq} lic</div></div></div></div>`;};
-  const ba=document.getElementById('redis-ba');if(ba)ba.innerHTML=card(o,o.qtd-qtd,`📤 ${o.servidor}`)+card(dst,dst.qtd+qtd,`📥 ${dst.servidor}`);
+  const excTotal=Array.from(_redisOrigens).reduce((a,id)=>{const s=d.find(x=>x.id===id);return a+(s?Math.abs(s.sg):0);},0);
+  const defTotal=Array.from(_redisDestinos).reduce((a,id)=>{const s=d.find(x=>x.id===id);return a+(s?s.sg:0);},0);
+  const excEl=gi('redis-exc-total');if(excEl)excEl.textContent=excTotal;
+  const defEl=gi('redis-def-total');if(defEl)defEl.textContent=defTotal;
 }
-function resetRedis(){initRedis();}
+function calcRedisMulti(){
+  const d=getDv();
+  const qtd=+gi('redis-qtd-total').value||0;
+  const allowDup=gi('redis-allow-dup')&&gi('redis-allow-dup').checked;
+
+  if(!_redisOrigens.size||!_redisDestinos.size||qtd<=0){
+    gi('redis-preview').style.display='none';
+    gi('redis-empty').style.display='block';
+    const sb=gi('redis-save-btn');if(sb)sb.style.display='none';
+    return;
+  }
+
+  const origens=Array.from(_redisOrigens).map(id=>d.find(s=>s.id===id)).filter(Boolean);
+  const destinos=Array.from(_redisDestinos).map(id=>d.find(s=>s.id===id)).filter(Boolean);
+
+  // Distribuição proporcional ao déficit
+  const defTotal=destinos.reduce((a,s)=>a+s.sg,0)||1;
+  let restante=qtd;
+  const planDestinos=destinos.map((s,i)=>{
+    const proporcao=s.sg/defTotal;
+    const rec=i===destinos.length-1?restante:Math.round(proporcao*qtd);
+    restante-=rec;
+    return{...s,rec:Math.max(0,rec),nq:s.qtd+Math.max(0,rec)};
+  });
+
+  // Distribuição das origens: proporcionalmente ao excedente ou igualmente
+  const excTotal=origens.reduce((a,s)=>a+Math.abs(s.sg),0)||1;
+  let restOri=qtd;
+  const planOrigens=origens.map((s,i)=>{
+    const proporcao=Math.abs(s.sg)/excTotal;
+    const dado=i===origens.length-1?restOri:Math.round(proporcao*qtd);
+    restOri-=dado;
+    return{...s,dado:Math.max(0,dado),nq:s.qtd-Math.max(0,dado)};
+  });
+
+  // Verificação: checar se origems têm suficiente
+  const alertas=planOrigens.filter(s=>s.dado>s.l);
+
+  gi('redis-preview').style.display='block';
+  gi('redis-empty').style.display='none';
+  const sb=gi('redis-save-btn');if(sb)sb.style.display='block';
+
+  const colOri=planOrigens.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';return`<tr><td class="b">📤 ${s.servidor}</td><td class="m" style="color:#A78BFA">${s.qtd}</td><td class="m" style="color:#F87171">−${s.dado}</td><td class="m" style="color:var(--in3)">${s.nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;}).join('');
+  const colDst=planDestinos.map(s=>{const np=s.qtd>0?Math.round(s.util/s.nq*100):0;const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';return`<tr><td class="b">📥 ${s.servidor}</td><td class="m" style="color:#A78BFA">${s.qtd}</td><td class="m" style="color:#34D399">+${s.rec}</td><td class="m" style="color:var(--in3)">${s.nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;}).join('');
+
+  const alertaHtml=alertas.length>0?`<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#F87171;margin-bottom:10px">⚠ Atenção: ${alertas.map(s=>`${s.servidor} dará ${s.dado} mas só tem ${s.l} livres`).join(' | ')}${allowDup?' — duplicação ativada':''}</div>`:'';
+  const dupInfo=allowDup?`<div style="margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--am3);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 12px">✓ Duplicação permitida — uma mesma licença pode ser enviada a múltiplos destinos</div>`:'';
+
+  gi('redis-plan-table').innerHTML=alertaHtml+dupInfo+`
+    <div class="tw"><table style="min-width:500px">
+      <thead><tr><th>Servidor</th><th>Antes</th><th>Movimento</th><th>Depois</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead>
+      <tbody>${colOri}${colDst}</tbody>
+    </table></div>
+    <div style="margin-top:10px;display:flex;gap:10px;font-size:11px;font-family:var(--mono)">
+      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Total movendo: <strong style="color:var(--in3)">${qtd} lic.</strong></span>
+      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Origens: <strong style="color:#F87171">${planOrigens.length}</strong></span>
+      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Destinos: <strong style="color:#34D399">${planDestinos.length}</strong></span>
+    </div>`;
+
+  // Guardar plano para salvar
+  window._redisPlanOrigens=planOrigens;
+  window._redisPlanDestinos=planDestinos;
+  window._redisAllowDup=allowDup;
+}
+
+function resetRedis(){initRedisMulti();}
+
+async function applyRedis(){
+  const planO=window._redisPlanOrigens||[];const planD=window._redisPlanDestinos||[];
+  if(!planO.length&&!planD.length){toast('⚠ Nenhum plano para salvar.','warn');return;}
+  const allowDup=window._redisAllowDup;
+  const qtd=+gi('redis-qtd-total').value||0;
+
+  if(!allowDup){
+    const excTotal=planO.reduce((a,s)=>a+s.l,0);
+    if(qtd>excTotal&&!confirm(`Quantidade (${qtd}) maior que o excedente disponível (${excTotal}). Continuar mesmo assim?`))return;
+  }
+  if(!confirm(`Aplicar redistribuição de ${qtd} licenças entre ${planO.length} origem(ns) e ${planD.length} destino(s)?`))return;
+
+  showLoading('Aplicando redistribuição...');
+  const detalhes=[];
+  try{
+    for(const s of planO){
+      await sbPatch('servidores',s.id,{qtd:s.nq});
+      const idx=S.findIndex(x=>x.id===s.id);if(idx>=0)S[idx]={...S[idx],qtd:s.nq};
+      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq} (−${s.dado})`);
+    }
+    for(const s of planD){
+      await sbPatch('servidores',s.id,{qtd:s.nq});
+      const idx=S.findIndex(x=>x.id===s.id);if(idx>=0)S[idx]={...S[idx],qtd:s.nq};
+      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq} (+${s.rec})`);
+    }
+    sortS();invDv();badge();
+    addAudit('Redistribuição de Licenças',detalhes.join(' | ')+(allowDup?' [duplicação]':''),'upd');
+    toast(`✓ Redistribuição de ${qtd} lic. salva!`,'ok');
+    initRedisMulti();rDash();
+  }catch(err){toast('⚠ '+err.message,'error');}
+  finally{hideLoading();}
+}
+
 function exportRedis(){
-  const d=getDv();const oId=document.getElementById('redis-origem').value,dId=document.getElementById('redis-destino').value,qtd=+document.getElementById('redis-qtd').value||0;
-  const o=d.find(s=>s.id==oId),dst=d.find(s=>s.id==dId);
-  if(!o||!dst||!qtd){toast('⚠ Preencha todos os campos.','warn');return;}
+  const planO=window._redisPlanOrigens||[];const planD=window._redisPlanDestinos||[];
+  if(!planO.length&&!planD.length){toast('⚠ Simule primeiro.','warn');return;}
   const now=new Date();
-  const ws=XLSX.utils.aoa_to_sheet([['Redistribuição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],[''],['Servidor','Lic. Antes','Lic. Depois','Diferença','Uso % Antes','Uso % Depois'],[o.servidor,o.qtd,o.qtd-qtd,-qtd,o.p+'%',(o.qtd-qtd)>0?Math.round(o.util/(o.qtd-qtd)*100)+'%':'-'],[dst.servidor,dst.qtd,dst.qtd+qtd,+qtd,dst.p+'%',Math.round(dst.util/(dst.qtd+qtd)*100)+'%']]);
+  const rows=[['Redistribuição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],[''],
+    ['Servidor','Tipo','Lic. Antes','Mov.','Lic. Depois','Uso % Antes','Uso % Depois'],
+    ...planO.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;return[s.servidor,'Origem',s.qtd,-s.dado,s.nq,s.p+'%',np+'%'];}),
+    ...planD.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;return[s.servidor,'Destino',s.qtd,+s.rec,s.nq,s.p+'%',np+'%'];}),
+  ];
+  const ws=XLSX.utils.aoa_to_sheet(rows);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Redistribuição');
-  XLSX.writeFile(wb,`redistribuicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);toast('✓ Exportado!','ok');
+  XLSX.writeFile(wb,`redistribuicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);
+  toast('✓ Exportado!','ok');
 }
-// ═══ AQUISIÇÃO ═══
-let _acqMode=0; // 0=auto, 1=aleatorio, 2=manual
-let _acqPlan=[]; // plano atual
+
+// ═══ AQUISIÇÃO — 3 MODOS ═══
+const ACQ_DESC=[
+  'Prioriza servidores abaixo do ideal, depois distribui igualmente o restante.',
+  'Prioriza déficits, então distribui o restante aleatoriamente pelo grupo selecionado.',
+  'Você define manualmente quantas licenças cada servidor recebe.'
+];
 
 function setAcqMode(m){
   _acqMode=m;
-  for(let i=0;i<3;i++){const b=document.getElementById('acq-m'+i);if(b)b.className='btn bg';}
-  const mb=document.getElementById('acq-m'+m);if(mb)mb.className='btn bp';
+  for(let i=0;i<3;i++){const b=gi('acq-m'+i);if(b)b.className='mode-btn'+(i===m?' a':'');}
+  const desc=gi('acq-mode-desc');if(desc)desc.textContent=ACQ_DESC[m];
   calcAcq();
 }
 
 function calcAcq(){
-  const qtd=+document.getElementById('acq-qtd').value||0;
-  const preco=+document.getElementById('acq-preco').value||0;
-  const grupo=document.getElementById('acq-grupo').value;
-  const el=document.getElementById('acq-result');
-  const saveBar=document.getElementById('acq-save-bar');
+  const qtd=+gi('acq-qtd').value||0;
+  const preco=+gi('acq-preco').value||0;
+  const grupo=gi('acq-grupo').value;
+  const el=gi('acq-result');
   if(!el)return;
-  if(!qtd){el.innerHTML='<div class="empty">Informe a quantidade de licenças a adquirir</div>';if(saveBar)saveBar.style.display='none';return;}
+  if(!qtd){el.innerHTML='<div class="empty">Informe a quantidade de licenças a adquirir</div>';gi('acq-save-bar').style.display='none';return;}
 
   const d=getDv();
   const pool=grupo==='total'?d:d.filter(s=>s.servidor.toLowerCase().includes(grupo));
 
-  // Fase 1: priorizar abaixo do ideal
+  // Ordenação: primeiro abaixo do ideal (sg > 0), depois os demais
   const abaixo=[...pool].filter(s=>s.sg>0).sort((a,b)=>b.sg-a.sg);
   const noIdeal=[...pool].filter(s=>s.sg<=0).sort((a,b)=>b.p-a.p);
   const ordem=[...abaixo,...noIdeal];
@@ -757,55 +1018,46 @@ function calcAcq(){
   let dist;
 
   if(_acqMode===0){
-    // AUTOMÁTICO: preenche déficits primeiro, depois distribui igualmente
+    // AUTOMÁTICO
     let rest=qtd;
     dist=ordem.map(s=>{const nec=Math.max(0,s.sg);const rec=Math.min(nec,rest);rest=Math.max(0,rest-rec);return{...s,rec};});
-    // distribuir sobra igualmente
     if(rest>0&&dist.length>0){const extra=Math.floor(rest/dist.length);const rem=rest%dist.length;dist.forEach((s,i)=>{s.rec+=extra+(i<rem?1:0);});}
 
   }else if(_acqMode===1){
-    // ALEATÓRIO: déficits primeiro, depois aleatório nos demais
+    // ALEATÓRIO: zera déficits primeiro, depois aleatório
     let rest=qtd;
     dist=ordem.map(s=>({...s,rec:0}));
-    // primeiro zera déficits
     dist.filter(s=>s.sg>0).forEach(s=>{const rec=Math.min(s.sg,rest);s.rec=rec;rest-=rec;});
-    // restante: distribui aleatoriamente
     if(rest>0){
       const disponiveis=dist.filter(s=>s.sg<=0);
-      if(disponiveis.length>0){
-        // gera pesos aleatórios
-        const pesos=disponiveis.map(()=>Math.random());
-        const total=pesos.reduce((a,b)=>a+b,0);
-        let alocado=0;
-        disponiveis.forEach((s,i)=>{
-          const rec=i===disponiveis.length-1?rest-alocado:Math.round((pesos[i]/total)*rest);
-          s.rec+=Math.max(0,rec);alocado+=Math.max(0,rec);
-        });
-      }else{
-        // todos abaixo do ideal — distribui aleatoriamente entre todos
-        const pesos=dist.map(()=>Math.random());
-        const total=pesos.reduce((a,b)=>a+b,0);
-        let alocado=0;
-        dist.forEach((s,i)=>{
-          const rec=i===dist.length-1?rest-alocado:Math.round((pesos[i]/total)*rest);
-          s.rec+=Math.max(0,rec);alocado+=Math.max(0,rec);
-        });
-      }
+      const alvo=disponiveis.length>0?disponiveis:dist;
+      const pesos=alvo.map(()=>Math.random());
+      const total=pesos.reduce((a,b)=>a+b,0)||1;
+      let alocado=0;
+      alvo.forEach((s,i)=>{
+        const rec=i===alvo.length-1?rest-alocado:Math.round((pesos[i]/total)*rest);
+        s.rec+=Math.max(0,rec);alocado+=Math.max(0,rec);
+      });
     }
 
   }else{
-    // MANUAL: campos editáveis
-    dist=ordem.map(s=>({...s,rec:Math.max(0,s.sg)})); // sugere déficit como default
-    // limitar ao total disponível — será validado no render
+    // MANUAL
+    dist=ordem.map(s=>({...s,rec:Math.max(0,s.sg)}));
   }
 
   _acqPlan=dist.map(s=>({...s,nq:s.qtd+s.rec,np:(s.qtd+s.rec)>0?Math.round(s.util/(s.qtd+s.rec)*100):0}));
   renderAcqTable(qtd,preco);
-  if(saveBar)saveBar.style.display=_acqPlan.filter(s=>s.rec>0).length>0?'block':'none';
+  const totalRec=_acqPlan.reduce((a,s)=>a+s.rec,0);
+  const saveBar=gi('acq-save-bar');
+  if(saveBar){
+    saveBar.style.display=totalRec>0?'flex':'none';
+    const info=gi('acq-save-info');
+    if(info)info.textContent=_acqPlan.filter(s=>s.rec>0).length+' servidores';
+  }
 }
 
 function renderAcqTable(qtd,preco){
-  const el=document.getElementById('acq-result');if(!el)return;
+  const el=gi('acq-result');if(!el)return;
   const totalRec=_acqPlan.reduce((a,s)=>a+s.rec,0);
   const sobra=qtd-totalRec;
   const custo=preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'—';
@@ -819,9 +1071,7 @@ function renderAcqTable(qtd,preco){
 
   const rows=_acqPlan.map((s,idx)=>{
     const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
-    const nq=s.qtd+s.rec;
-    const np=nq>0?Math.round(s.util/nq*100):0;
-    const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';
+    const nq=s.qtd+s.rec,np=nq>0?Math.round(s.util/nq*100):0,cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';
     const tag=s.sg>0?`<span class="badge bgr" style="font-size:9px">Abaixo ideal</span>`:`<span class="badge bgg" style="font-size:9px">No/acima ideal</span>`;
     const recCell=_acqMode===2
       ?`<input type="number" value="${s.rec}" min="0" style="width:70px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:4px 8px;color:var(--t1);font-family:var(--mono);font-size:11px;outline:none;text-align:center" oninput="updateManual(${idx},this.value)">`
@@ -829,53 +1079,50 @@ function renderAcqTable(qtd,preco){
     return`<tr><td class="b">${s.servidor}</td><td>${tag}</td><td class="m">${s.qtd}</td><td>${recCell}</td><td class="m" style="color:var(--in3)">${nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;
   }).join('');
 
-  el.innerHTML=kpis+`<div class="tc"><div class="th2"><div class="tt">Plano de Distribuição</div>${_acqMode===1?`<button class="btn bg" style="font-size:10px" onclick="calcAcq()">🎲 Redistribuir aleatório</button>`:''}</div><div class="tw"><table style="min-width:550px"><thead><tr><th>Servidor</th><th>Status</th><th>Atual</th><th>Recebe</th><th>Novo Total</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+  el.innerHTML=kpis+`<div class="tc"><div class="th2">
+    <div class="tt">Plano de Distribuição</div>
+    ${_acqMode===1?`<button class="btn bg" style="font-size:10px" onclick="calcAcq()">🎲 Redistribuir aleatório</button>`:''}
+  </div><div class="tw"><table style="min-width:550px"><thead><tr><th>Servidor</th><th>Status</th><th>Atual</th><th>Recebe</th><th>Novo Total</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead><tbody>${rows}</tbody></table></div></div>
   ${sobra>0&&_acqMode!==2?`<div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#FCD34D">⚠ ${sobra} licença(s) não alocada(s).</div>`:''}`;
 }
 
 function updateManual(idx,val){
   if(_acqPlan[idx])_acqPlan[idx].rec=Math.max(0,+val||0);
-  const qtd=+document.getElementById('acq-qtd').value||0;
-  const preco=+document.getElementById('acq-preco').value||0;
+  const qtd=+gi('acq-qtd').value||0;
   const totalRec=_acqPlan.reduce((a,s)=>a+s.rec,0);
-  const sobra=qtd-totalRec;
-  // atualiza apenas os KPIs sem rerender a tabela (para não perder foco)
-  const saveBar=document.getElementById('acq-save-bar');
-  if(saveBar)saveBar.style.display=totalRec>0?'block':'none';
+  const saveBar=gi('acq-save-bar');if(saveBar){saveBar.style.display=totalRec>0?'flex':'none';const info=gi('acq-save-info');if(info)info.textContent=_acqPlan.filter(s=>s.rec>0).length+' servidores';}
 }
 
 async function applyAcq(){
   const plan=_acqPlan.filter(s=>s.rec>0);
   if(!plan.length){toast('⚠ Nenhuma licença para distribuir.','warn');return;}
-  if(!confirm(`Aplicar distribuição para ${plan.length} servidor(es)? Isso atualizará os dados no banco.`))return;
-  showLoading('Aplicando distribuição...');
+  const qtd=plan.reduce((a,s)=>a+s.rec,0);
+  if(!confirm(`Aplicar aquisição de ${qtd} licenças para ${plan.length} servidor(es)?`))return;
+  showLoading('Aplicando aquisição...');
+  const detalhes=[];
   try{
     for(const s of plan){
       const novaQtd=s.qtd+s.rec;
       await sbPatch('servidores',s.id,{qtd:novaQtd});
-      const idx=S.findIndex(x=>x.id===s.id);
-      if(idx>=0)S[idx]={...S[idx],qtd:novaQtd};
+      const idx=S.findIndex(x=>x.id===s.id);if(idx>=0)S[idx]={...S[idx],qtd:novaQtd};
+      detalhes.push(`${s.servidor}: +${s.rec} (${s.qtd}→${novaQtd})`);
     }
     sortS();invDv();badge();
+    addAudit('Aquisição de Licenças',`Modo: ${['Automático','Aleatório','Manual'][_acqMode]} | `+detalhes.join(' | '),'upd');
     toast(`✓ ${plan.length} servidor(es) atualizados!`,'ok');
-    _acqPlan=[];
-    document.getElementById('acq-result').innerHTML='<div class="empty">Distribuição aplicada com sucesso! Dados atualizados.</div>';
-    document.getElementById('acq-save-bar').style.display='none';
-    rDash();
+    _acqPlan=[];gi('acq-result').innerHTML='<div class="empty">Aquisição aplicada! Dados atualizados.</div>';
+    gi('acq-save-bar').style.display='none';rDash();
   }catch(err){toast('⚠ '+err.message,'error');}
   finally{hideLoading();}
 }
 
 function exportAcqPlan(){
-  const qtd=+document.getElementById('acq-qtd').value||0;
-  const preco=+document.getElementById('acq-preco').value||0;
+  const qtd=+gi('acq-qtd').value||0,preco=+gi('acq-preco').value||0;
   const now=new Date();
   const ws=XLSX.utils.aoa_to_sheet([
-    ['Plano de Aquisição — SRV Monitor'],
-    ['Gerado: '+now.toLocaleString('pt-BR')],
-    ['Licenças: '+qtd],
-    ['Custo: '+(preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'N/A')],
-    [''],
+    ['Plano de Aquisição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],
+    ['Modo: '+['Automático','Aleatório','Manual'][_acqMode]],
+    ['Licenças: '+qtd],['Custo: '+(preco>0?'R$ '+(qtd*preco).toLocaleString('pt-BR',{minimumFractionDigits:2}):'N/A')],[''],
     ['Servidor','Status','Qtd. Atual','Recebe','Novo Total','Uso % Antes','Uso % Depois'],
     ..._acqPlan.map(s=>{const nq=s.qtd+s.rec;const np=nq>0?Math.round(s.util/nq*100):0;return[s.servidor,s.sg>0?'Abaixo do ideal':'No/acima do ideal',s.qtd,s.rec,nq,s.p+'%',np+'%'];})
   ]);
@@ -884,11 +1131,70 @@ function exportAcqPlan(){
   toast('✓ Exportado!','ok');
 }
 
-function exportAcq(qtd,preco,grupo){exportAcqPlan();}
-async function rProjHist(){
-  const snaps=await loadSnaps();const el=document.getElementById('proj-hist-content');if(!el)return;
+// ═══ HISTÓRICO ═══
+let _histTab=0;
+function showHistTab(idx){
+  _histTab=idx;
+  for(let i=0;i<2;i++){const b=gi('hb'+i);if(b)b.className='btn '+(i===idx?'bp':'bg');}
+  gi('hist-snaps').style.display=idx===0?'block':'none';
+  gi('hist-audit').style.display=idx===1?'block':'none';
+  if(idx===0)renderHistSnaps();else renderHistAudit();
+}
+async function rProjHist(){showHistTab(0);}
+
+async function renderHistSnaps(){
+  const el=gi('hist-snaps');if(!el)return;
+  el.innerHTML='<div class="empty">Carregando...</div>';
+  const snaps=await loadSnaps();
   if(!snaps.length){el.innerHTML='<div class="empty">Nenhum snapshot. Use "Salvar Snapshot" para registrar.</div>';return;}
-  el.innerHTML=snaps.map(snap=>`<div class="cc" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:13px;font-weight:700;color:var(--t1)">📸 ${snap.label}</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px">${snap.servidores.length} servidores</div></div><div style="display:grid;grid-template-columns:repeat(4,auto);gap:16px"><div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Lic.</div><div style="font-family:var(--mono);font-weight:700;color:var(--in3)">${snap.totalLic}</div></div><div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Util.</div><div style="font-family:var(--mono);font-weight:700;color:#FCD34D">${snap.totalUtil}</div></div><div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Cam.</div><div style="font-family:var(--mono);font-weight:700;color:#22D3EE">${snap.totalCam}</div></div><div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">I.A</div><div style="font-family:var(--mono);font-weight:700;color:#A78BFA">${snap.totalIA}</div></div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px">${snap.servidores.map(s=>{const p=s.qtd>0?Math.round(s.util/s.qtd*100):0;const c=p>=90?'#EF4444':p>=70?'#F59E0B':'#10B981';return`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:8px 12px"><div style="font-size:11px;font-weight:600;color:var(--t1);font-family:var(--mono);margin-bottom:4px">${s.servidor}</div><div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--t3);margin-bottom:5px"><span>${s.util}/${s.qtd}</span><span style="color:${c}">${p}%</span></div><div style="height:3px;background:var(--s4);border-radius:2px;overflow:hidden"><div style="height:100%;width:${Math.min(p,100)}%;background:${c};border-radius:2px"></div></div></div>`;}).join('')}</div></div>`).join('');
+  el.innerHTML=snaps.map(snap=>`
+    <div class="cc" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><div style="font-size:13px;font-weight:700;color:var(--t1)">📸 ${snap.label}</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px">${snap.servidores.length} servidores</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,auto);gap:16px">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Lic.</div><div style="font-family:var(--mono);font-weight:700;color:var(--in3)">${snap.totalLic}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Util.</div><div style="font-family:var(--mono);font-weight:700;color:#FCD34D">${snap.totalUtil}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Cam.</div><div style="font-family:var(--mono);font-weight:700;color:#22D3EE">${snap.totalCam}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">I.A</div><div style="font-family:var(--mono);font-weight:700;color:#A78BFA">${snap.totalIA}</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px">
+        ${snap.servidores.map(s=>{const p=s.qtd>0?Math.round(s.util/s.qtd*100):0;const c=p>=90?'#EF4444':p>=70?'#F59E0B':'#10B981';return`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:8px 12px"><div style="font-size:11px;font-weight:600;color:var(--t1);font-family:var(--mono);margin-bottom:4px">${s.servidor}</div><div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--t3);margin-bottom:5px"><span>${s.util}/${s.qtd}</span><span style="color:${c}">${p}%</span></div><div style="height:3px;background:var(--s4);border-radius:2px;overflow:hidden"><div style="height:100%;width:${Math.min(p,100)}%;background:${c};border-radius:2px"></div></div></div>`;}).join('')}
+      </div>
+    </div>`).join('');
+}
+
+async function renderHistAudit(){
+  const el=gi('hist-audit');if(!el)return;
+  el.innerHTML='<div class="empty">Carregando...</div>';
+  let logs=[];
+  try{logs=await sbGet('auditoria','order=id.desc&limit=300');}catch(e){logs=[];}
+  if(!logs.length){el.innerHTML='<div class="empty">Nenhuma ação registrada ainda.</div>';return;}
+
+  const eMap={ins:'＋',upd:'✎',del:'✕',log:'→'};
+  const labelMap={ins:'Criado',upd:'Editado',del:'Removido',log:'Acesso'};
+  const colorMap={ins:'rgba(16,185,129',upd:'rgba(79,70,229',del:'rgba(239,68,68',log:'rgba(124,58,237'};
+  const icMap={ins:'hist-ins',upd:'hist-upd',del:'hist-del',log:'hist-sys'};
+
+  el.innerHTML=`<div class="tc"><div class="tw" style="max-height:560px;overflow-y:auto">
+    <table style="min-width:520px">
+      <thead><tr><th>Data/Hora</th><th>Tipo</th><th>Ação</th><th>Detalhe</th><th>Usuário</th></tr></thead>
+      <tbody>
+      ${logs.map(l=>{
+        const dt=new Date(l.ts).toLocaleString('pt-BR');
+        const tp=l.tipo||'upd';
+        const cor=colorMap[tp]||colorMap.upd;
+        return`<tr>
+          <td class="m" style="color:var(--t3)">${dt}</td>
+          <td><span style="background:${cor},0.1);color:${cor},1);border:1px solid ${cor},0.2);padding:2px 8px;border-radius:5px;font-size:10px;font-family:var(--mono);font-weight:600">${eMap[tp]||'•'} ${labelMap[tp]||tp}</span></td>
+          <td class="b" style="font-size:12px">${l.acao}</td>
+          <td class="m" style="color:var(--t2);max-width:260px;white-space:normal;word-break:break-word">${l.detalhe||'—'}</td>
+          <td class="m" style="color:var(--in3)">${l.usuario||'—'}</td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table>
+  </div></div>`;
 }
 
 // DETALHE
@@ -905,7 +1211,7 @@ function openDetail(id){
   gi('modal-detail').classList.add('o');
 }
 
-// CRUD
+// CRUD com auditoria
 function calc(){const q=+gi('fq').value||0,u=+gi('fu').value||0,i=+gi('fi2').value||0;gi('fl2').value=q-u;gi('fe').value=q-i;}
 function openAdd(){gi('mtitle').textContent='Novo Servidor';gi('eid').value='';['fs','fq','fu','fi2','fc','fca','fl2','fe'].forEach(id=>gi(id).value='');gi('modal').classList.add('o');setTimeout(()=>gi('fs').focus(),100);}
 function openEdit(id){const s=S.find(x=>x.id===id);if(!s)return;gi('mtitle').textContent='Editar — '+s.servidor;gi('eid').value=s.id;gi('fs').value=s.servidor;gi('fq').value=s.qtd;gi('fu').value=s.util;gi('fi2').value=s.ideal;gi('fc').value=s.cam;gi('fca').value=s.caia;calc();gi('modal').classList.add('o');}
@@ -915,8 +1221,19 @@ async function save(){
   const o={servidor:srv,qtd:+gi('fq').value||0,util:+gi('fu').value||0,ideal:+gi('fi2').value||0,cam:+gi('fc').value||0,caia:+gi('fca').value||0};
   closeModal();showLoading(id?'Atualizando...':'Salvando...');
   try{
-    if(id){const upd=await sbPatch('servidores',+id,o);const i=S.findIndex(s=>s.id===+id);if(i>=0)S[i]={...S[i],...upd};sortS();}
-    else{const ins=await sbPost('servidores',o);S.push(ins);sortS();}
+    if(id){
+      const old=S.find(s=>s.id===+id);
+      const upd=await sbPatch('servidores',+id,o);
+      const i=S.findIndex(s=>s.id===+id);if(i>=0)S[i]={...S[i],...upd};
+      sortS();
+      const campos=[];
+      if(old){['servidor','qtd','util','ideal','cam','caia'].forEach(k=>{if(old[k]!==o[k])campos.push(`${k}: ${old[k]}→${o[k]}`);});}
+      addAudit('Servidor Editado',`${srv} | ${campos.join(', ')||'sem alteração'}`, 'upd');
+    }
+    else{
+      const ins=await sbPost('servidores',o);S.push(ins);sortS();
+      addAudit('Servidor Criado',`${srv} | Licenças: ${o.qtd} | Util: ${o.util} | Ideal: ${o.ideal}`,'ins');
+    }
     invDv();badge();
     const a=document.querySelector('.panel.a');
     if(a){const pid=a.id.replace('p-','');if(pid==='dashboard')rDash();else if(pid==='servidores')rSrv();else if(pid==='projecoes')rProjCenario();}
@@ -927,12 +1244,16 @@ async function del(id){
   if(window.CU&&window.CU.perfil==='tecnico'){toast('⚠ Técnicos não podem excluir.','error');return;}
   const s=S.find(x=>x.id===id);if(!s||!confirm(`Remover "${s.servidor}"?`))return;
   showLoading('Removendo...');
-  try{await sbDelete('servidores',id);S=S.filter(x=>x.id!==id);invDv();badge();rSrv();rDash();toast('✓ Removido.','ok');}
+  try{
+    await sbDelete('servidores',id);
+    addAudit('Servidor Removido',`${s.servidor} | Licenças: ${s.qtd} | Util: ${s.util}`,'del');
+    S=S.filter(x=>x.id!==id);invDv();badge();rSrv();rDash();toast('✓ Removido.','ok');
+  }
   catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}
 }
-async function clearAll(){if(!confirm('Apagar todos os dados?'))return;showLoading('Limpando...');try{await sbDeleteAll('servidores');S=[];invDv();destroyCharts();rDash();toast('Dados removidos.','warn');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function clearAll(){if(!confirm('Apagar todos os dados?'))return;showLoading('Limpando...');try{await sbDeleteAll('servidores');addAudit('Limpeza Geral','Todos os servidores removidos','del');S=[];invDv();destroyCharts();rDash();toast('Dados removidos.','warn');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
 
-// IMPORTAR
+// IMPORTAR com auditoria
 function drop(e){e.preventDefault();gi('dz').classList.remove('drag');if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);}
 function readFile(f){if(!f)return;const r=new FileReader();r.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});IMP=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:0});showPrev(IMP);}catch(err){alert('Erro: '+err.message);}};r.readAsArrayBuffer(f);gi('fi-imp').value='';}
 function showPrev(rows){if(!rows.length){alert('Planilha vazia.');return;}const k=Object.keys(rows[0]);let h=`<table><thead><tr>${k.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>`;h+=rows.slice(0,30).map(r=>`<tr>${k.map(x=>`<td>${r[x]}</td>`).join('')}</tr>`).join('');if(rows.length>30)h+=`<tr><td colspan="${k.length}" class="empty">...e mais ${rows.length-30}</td></tr>`;h+='</tbody></table>';gi('pvc').innerHTML=h;gi('pva').style.display='block';}
@@ -943,22 +1264,25 @@ async function doImport(){
   const toInsert=[];IMP.forEach(r=>{const sv=fc(r,al.srv);if(!sv)return;toInsert.push({servidor:String(sv),qtd:+fc(r,al.qtd)||0,util:+fc(r,al.util)||0,ideal:+fc(r,al.ideal)||0,cam:+fc(r,al.cam)||0,caia:+fc(r,al.caia)||0});});
   if(!toInsert.length){cancelImp();alert('Nenhum registro válido.');return;}
   cancelImp();showLoading('Importando...');
-  try{const ins=await sbPostMany('servidores',toInsert);ins.forEach(s=>S.push(s));sortS();invDv();rDash();toast('✓ '+toInsert.length+' importado(s)!','ok');}
-  catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}
+  try{
+    const ins=await sbPostMany('servidores',toInsert);ins.forEach(s=>S.push(s));sortS();invDv();
+    addAudit('Importação de Planilha',`${toInsert.length} servidores importados`,'ins');
+    rDash();toast('✓ '+toInsert.length+' importado(s)!','ok');
+  }catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}
 }
 
-// BACKUP
-function backup(){if(!S.length){alert('Nenhum dado.');return;}const b=new Blob([JSON.stringify({sistema:'SRV Monitor',data:new Date().toISOString(),dados:S},null,2)],{type:'application/json'});const a=document.createElement('a'),n=new Date();a.href=URL.createObjectURL(b);a.download=`backup-${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}.json`;a.click();URL.revokeObjectURL(a.href);}
-function restore(f){if(!f)return;const r=new FileReader();r.onload=async e=>{try{const p=JSON.parse(e.target.result),d=p.dados||p;if(!Array.isArray(d))throw new Error('Formato inválido.');if(!confirm(`Restaurar ${d.length} servidor(es)?`))return;showLoading('Restaurando...');await sbDeleteAll('servidores');const ins=await sbPostMany('servidores',d.map(o=>({servidor:o.servidor,qtd:o.qtd||0,util:o.util||0,ideal:o.ideal||0,cam:o.cam||0,caia:o.caia||0})));S=ins;sortS();invDv();rDash();hideLoading();toast(`✓ ${ins.length} restaurado(s)!`,'ok');}catch(err){hideLoading();alert('Erro: '+err.message);}};r.readAsText(f);gi('ri').value='';}
+// BACKUP com auditoria
+function backup(){if(!S.length){alert('Nenhum dado.');return;}const b=new Blob([JSON.stringify({sistema:'SRV Monitor',data:new Date().toISOString(),dados:S},null,2)],{type:'application/json'});const a=document.createElement('a'),n=new Date();a.href=URL.createObjectURL(b);a.download=`backup-${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}.json`;a.click();URL.revokeObjectURL(a.href);addAudit('Backup JSON',S.length+' servidores exportados','log');}
+function restore(f){if(!f)return;const r=new FileReader();r.onload=async e=>{try{const p=JSON.parse(e.target.result),d=p.dados||p;if(!Array.isArray(d))throw new Error('Formato inválido.');if(!confirm(`Restaurar ${d.length} servidor(es)?`))return;showLoading('Restaurando...');await sbDeleteAll('servidores');const ins=await sbPostMany('servidores',d.map(o=>({servidor:o.servidor,qtd:o.qtd||0,util:o.util||0,ideal:o.ideal||0,cam:o.cam||0,caia:o.caia||0})));S=ins;sortS();invDv();addAudit('Restaurar Backup',ins.length+' servidores restaurados','ins');rDash();hideLoading();toast(`✓ ${ins.length} restaurado(s)!`,'ok');}catch(err){hideLoading();alert('Erro: '+err.message);}};r.readAsText(f);gi('ri').value='';}
 
 // USERS
 async function loadUsers(){if(!_usersCache){try{_usersCache=await sbGet('usuarios');}catch(e){_usersCache=[];}}return _usersCache;}
 function openUserModal(){gi('usr-modal-title').textContent='Novo Usuário';gi('usr-eid').value='';['usr-nome','usr-email','usr-senha'].forEach(id=>gi(id).value='');gi('usr-perfil').value='gestor';gi('modal-usr').classList.add('o');setTimeout(()=>gi('usr-nome').focus(),100);}
 function closeUserModal(){gi('modal-usr').classList.remove('o');}
-async function saveUser(){const id=gi('usr-eid').value,nome=gi('usr-nome').value.trim(),email=gi('usr-email').value.trim(),senha=gi('usr-senha').value,perfil=gi('usr-perfil').value;if(!nome||!email){alert('Preencha nome e e-mail.');return;}closeUserModal();showLoading('Salvando...');try{if(id){const upd={nome,email,perfil};if(senha)upd.senha=senha;await sbPatch('usuarios',id,upd);}else{if(!senha){hideLoading();alert('Informe a senha.');return;}await sbPost('usuarios',{id:'u'+Date.now(),nome,email,senha,perfil,ativo:true});}_usersCache=null;renderUsersGrid();toast('✓ Salvo!','ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
-async function toggleUser(id){showLoading('Atualizando...');try{const users=await loadUsers();const u=users.find(x=>x.id===id);if(!u){hideLoading();return;}await sbPatch('usuarios',id,{ativo:!u.ativo});_usersCache=null;renderUsersGrid();toast((u.ativo?'Desativado: ':'✓ Ativado: ')+u.nome,u.ativo?'warn':'ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function saveUser(){const id=gi('usr-eid').value,nome=gi('usr-nome').value.trim(),email=gi('usr-email').value.trim(),senha=gi('usr-senha').value,perfil=gi('usr-perfil').value;if(!nome||!email){alert('Preencha nome e e-mail.');return;}closeUserModal();showLoading('Salvando...');try{if(id){const upd={nome,email,perfil};if(senha)upd.senha=senha;await sbPatch('usuarios',id,upd);addAudit('Usuário Editado',`${nome} (${perfil})`,'upd');}else{if(!senha){hideLoading();alert('Informe a senha.');return;}await sbPost('usuarios',{id:'u'+Date.now(),nome,email,senha,perfil,ativo:true});addAudit('Usuário Criado',`${nome} (${perfil})`,'ins');}_usersCache=null;renderUsersGrid();toast('✓ Salvo!','ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function toggleUser(id){showLoading('Atualizando...');try{const users=await loadUsers();const u=users.find(x=>x.id===id);if(!u){hideLoading();return;}await sbPatch('usuarios',id,{ativo:!u.ativo});addAudit('Usuário '+(u.ativo?'Desativado':'Ativado'),u.nome,'upd');_usersCache=null;renderUsersGrid();toast((u.ativo?'Desativado: ':'✓ Ativado: ')+u.nome,u.ativo?'warn':'ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
 async function editUser(id){const users=await loadUsers();const u=users.find(x=>x.id===id);if(!u)return;gi('usr-modal-title').textContent='Editar — '+u.nome;gi('usr-eid').value=u.id;gi('usr-nome').value=u.nome;gi('usr-email').value=u.email;gi('usr-senha').value='';gi('usr-perfil').value=u.perfil;gi('modal-usr').classList.add('o');}
-async function deleteUser(id){const users=await loadUsers();const u=users.find(x=>x.id===id);if(!u||!confirm(`Remover "${u.nome}"?`))return;showLoading('Removendo...');try{await sbDelete('usuarios',id);_usersCache=null;renderUsersGrid();toast('✓ Removido.','ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function deleteUser(id){const users=await loadUsers();const u=users.find(x=>x.id===id);if(!u||!confirm(`Remover "${u.nome}"?`))return;showLoading('Removendo...');try{await sbDelete('usuarios',id);addAudit('Usuário Removido',u.nome,'del');_usersCache=null;renderUsersGrid();toast('✓ Removido.','ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
 async function renderUsersGrid(){
   const users=await loadUsers();
   const pfB=p=>p==='admin'?'<span class="badge bgp">Admin</span>':p==='tecnico'?'<span class="badge bgy">Técnico</span>':'<span class="badge bgg">Gestor</span>';
@@ -969,18 +1293,11 @@ async function renderUsersGrid(){
 
 // SNAPSHOTS
 async function loadSnaps(){if(!_snapCache){try{const rows=await sbGet('snapshots','order=id.asc');_snapCache=rows.map(r=>({...r,label:r.label,totalLic:r.total_lic,totalUtil:r.total_util,totalCam:r.total_cam,totalIA:r.total_ia,servidores:r.dados||[]}));}catch(e){_snapCache=[];}}return _snapCache;}
-async function saveSnapshot(){const now=new Date();const label=now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});showLoading('Salvando...');try{await sbPost('snapshots',{label,total_lic:S.reduce((a,s)=>a+s.qtd,0),total_util:S.reduce((a,s)=>a+s.util,0),total_cam:S.reduce((a,s)=>a+s.cam,0),total_ia:S.reduce((a,s)=>a+s.caia,0),dados:S.map(s=>({id:s.id,servidor:s.servidor,qtd:s.qtd,util:s.util,ideal:s.ideal,cam:s.cam,caia:s.caia}))});_snapCache=null;rRel();toast('✓ Snapshot: '+label,'ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
-async function clearSnapshots(){if(!confirm('Apagar histórico?'))return;showLoading('Limpando...');try{await sbDeleteAll('snapshots');_snapCache=null;rRel();toast('Histórico limpo.','warn');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function saveSnapshot(){const now=new Date();const label=now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});showLoading('Salvando...');try{await sbPost('snapshots',{label,total_lic:S.reduce((a,s)=>a+s.qtd,0),total_util:S.reduce((a,s)=>a+s.util,0),total_cam:S.reduce((a,s)=>a+s.cam,0),total_ia:S.reduce((a,s)=>a+s.caia,0),dados:S.map(s=>({id:s.id,servidor:s.servidor,qtd:s.qtd,util:s.util,ideal:s.ideal,cam:s.cam,caia:s.caia}))});addAudit('Snapshot Salvo',label+' — '+S.length+' servidores','log');_snapCache=null;rRel();toast('✓ Snapshot: '+label,'ok');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
+async function clearSnapshots(){if(!confirm('Apagar histórico?'))return;showLoading('Limpando...');try{await sbDeleteAll('snapshots');addAudit('Snapshots Apagados','Histórico completo removido','del');_snapCache=null;rRel();toast('Histórico limpo.','warn');}catch(err){toast('⚠ '+err.message,'error');}finally{hideLoading();}}
 
 // RELATÓRIOS
-function relTab(id,el){
-  document.querySelectorAll('#rel-tabs .tab').forEach(t=>t.classList.remove('a'));
-  document.querySelectorAll('#p-relatorios .tsec').forEach(s=>s.classList.remove('a'));
-  el.classList.add('a');gi('rel-'+id).classList.add('a');
-  if(id==='historico')renderHistChart();
-  if(id==='comparativo')renderComp();
-  if(id==='tendencia')renderTend();
-}
+function relTab(id,el){document.querySelectorAll('#rel-tabs .tab').forEach(t=>t.classList.remove('a'));document.querySelectorAll('#p-relatorios .tsec').forEach(s=>s.classList.remove('a'));el.classList.add('a');gi('rel-'+id).classList.add('a');if(id==='historico')renderHistChart();if(id==='comparativo')renderComp();if(id==='tendencia')renderTend();}
 async function rRel(){const t=document.querySelector('#rel-tabs .tab.a');const txt=t?t.textContent:'';if(txt.includes('Comp'))renderComp();else if(txt.includes('Tend'))renderTend();else renderHistChart();}
 let chartHist=null,chartHistCam=null,chartTrend=null;
 async function renderHistChart(){
