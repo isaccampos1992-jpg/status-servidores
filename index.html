@@ -398,63 +398,70 @@ td.m{font-family:var(--mono);font-size:11px}
           <div class="pjg" id="pjg"></div>
         </div>
 
-        <!-- REDISTRIBUIÇÃO MÚLTIPLA -->
+        <!-- REDISTRIBUIÇÃO -->
         <div id="psec-1" style="display:none">
-          <div class="sec-hdr">
-            <div><div class="sec-title">Redistribuição de Licenças</div><div class="sec-sub">selecione múltiplos servidores de origem e destino</div></div>
-            <div style="display:flex;gap:8px">
-              <button class="btn bg" onclick="resetRedis()">✕ Limpar</button>
-              <button class="btn bg" onclick="exportRedis()">↓ Exportar</button>
-              <button class="btn bs" id="redis-save-btn" onclick="applyRedis()" style="display:none">💾 Salvar Redistribuição</button>
-            </div>
-          </div>
 
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:16px">
+          <!-- PASSO 1 + 2: seleção lado a lado -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+
             <!-- ORIGENS -->
-            <div class="cc">
-              <div class="cct" style="margin-bottom:6px">📤 Origens (excedente)</div>
-              <div class="ccs" style="margin-bottom:10px">Servidores com licenças acima do ideal</div>
-              <div class="srv-select-list" id="redis-origens-list"></div>
-              <div style="margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:8px;font-size:10px;font-family:var(--mono);color:var(--t3)">
-                Excedente total disponível: <strong id="redis-exc-total" style="color:var(--in3)">0</strong> licenças
+            <div class="cc" style="padding:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div>
+                  <div class="cct">📤 Origem</div>
+                  <div class="ccs" style="margin-bottom:0">Quem cede licenças</div>
+                </div>
+                <span id="redis-ori-count" style="font-family:var(--mono);font-size:11px;color:var(--in3);background:rgba(79,70,229,0.1);padding:3px 9px;border-radius:6px;display:none">0 selecionados</span>
               </div>
-            </div>
-
-            <!-- CONTROLE CENTRAL -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:30px;min-width:160px">
-              <div style="font-size:26px;color:var(--in3)">⇄</div>
-              <div style="width:100%">
-                <label style="font-size:10px;color:var(--t3);font-family:var(--mono);display:block;margin-bottom:5px">Total a redistribuir</label>
-                <input type="number" id="redis-qtd-total" class="fi" style="width:100%;text-align:center" placeholder="0" min="1" oninput="calcRedisMulti()">
-              </div>
-              <div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:10px;width:100%;text-align:center">
-                <div style="font-size:9px;color:var(--t3);font-family:var(--mono);margin-bottom:4px">DISTRIBUIÇÃO</div>
-                <div style="font-size:11px;color:var(--in3);font-family:var(--mono)" id="redis-mode-info">Proporcional ao déficit</div>
-              </div>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--t2);font-family:var(--mono)">
-                <input type="checkbox" id="redis-allow-dup" onchange="calcRedisMulti()" style="accent-color:var(--in2)"> Permitir duplicação
-              </label>
+              <div id="redis-ori-list" style="display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto"></div>
             </div>
 
             <!-- DESTINOS -->
-            <div class="cc">
-              <div class="cct" style="margin-bottom:6px">📥 Destinos (déficit)</div>
-              <div class="ccs" style="margin-bottom:10px">Servidores abaixo do ideal</div>
-              <div class="srv-select-list" id="redis-destinos-list"></div>
-              <div style="margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:8px;font-size:10px;font-family:var(--mono);color:var(--t3)">
-                Déficit total selecionado: <strong id="redis-def-total" style="color:var(--re3)">0</strong> licenças
+            <div class="cc" style="padding:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div>
+                  <div class="cct">📥 Destino</div>
+                  <div class="ccs" style="margin-bottom:0">Quem recebe licenças</div>
+                </div>
+                <span id="redis-dst-count" style="font-family:var(--mono);font-size:11px;color:var(--gr3);background:rgba(16,185,129,0.1);padding:3px 9px;border-radius:6px;display:none">0 selecionados</span>
+              </div>
+              <div id="redis-dst-list" style="display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto"></div>
+            </div>
+          </div>
+
+          <!-- PASSO 3: quantidade + botão simular -->
+          <div class="cc" style="padding:14px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:10px">
+                <label style="font-size:11px;color:var(--t2);font-family:var(--mono);white-space:nowrap">Licenças a mover:</label>
+                <input type="number" id="redis-qtd-total" class="fi" style="width:110px;text-align:center" placeholder="0" min="1" oninput="calcRedisMulti()">
+              </div>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--t2);font-family:var(--mono)">
+                <input type="checkbox" id="redis-allow-dup" onchange="calcRedisMulti()" style="accent-color:var(--in2)">
+                Permitir duplicação de licenças
+              </label>
+              <div style="margin-left:auto;display:flex;gap:8px">
+                <button class="btn bg" onclick="resetRedis()">✕ Limpar</button>
+                <button class="btn bg" onclick="exportRedis()">↓ Exportar</button>
+                <button class="btn bs" id="redis-save-btn" onclick="applyRedis()" style="display:none">💾 Salvar</button>
               </div>
             </div>
           </div>
 
-          <!-- PREVIEW REDISTRIBUIÇÃO -->
+          <!-- RESULTADO -->
           <div id="redis-preview" style="display:none">
-            <div class="cc" style="margin-bottom:12px">
-              <div class="cct" style="margin-bottom:14px">Plano de Redistribuição</div>
-              <div id="redis-plan-table"></div>
+            <div class="tc">
+              <div class="th2">
+                <div class="tt">Resultado da Redistribuição</div>
+                <div id="redis-resumo" style="font-size:11px;font-family:var(--mono);color:var(--t2)"></div>
+              </div>
+              <div class="tw"><table style="min-width:480px">
+                <thead><tr><th>Servidor</th><th>Licenças Antes</th><th>Movimento</th><th>Licenças Depois</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead>
+                <tbody id="redis-result-body"></tbody>
+              </table></div>
             </div>
           </div>
-          <div id="redis-empty" class="empty">Selecione origens, destinos e quantidade para simular</div>
+          <div id="redis-empty" class="empty" style="padding:20px">Selecione origens, destinos e quantidade para ver o resultado</div>
         </div>
 
         <!-- AQUISIÇÃO -->
@@ -804,132 +811,145 @@ function rProjCenario(){
   }).join('')||`<p class="empty">Nenhum servidor.</p>`;
 }
 
-// ═══ REDISTRIBUIÇÃO MÚLTIPLA ═══
-let _redisOrigens=new Set(),_redisDestinos=new Set();
+// ═══ REDISTRIBUIÇÃO — versão simples ═══
+let _redisOri=new Set(), _redisDst=new Set();
 
 function initRedisMulti(){
   const d=getDv();
-  _redisOrigens=new Set();_redisDestinos=new Set();
-
-  // Origens: servidores com excedente (qtd > ideal)
-  const exc=d.filter(s=>s.sg<0).sort((a,b)=>a.sg-b.sg); // sg negativo = excedente
-  // Destinos: servidores abaixo do ideal (sg > 0)
-  const def=d.filter(s=>s.sg>0).sort((a,b)=>b.sg-a.sg);
-
-  const listO=gi('redis-origens-list');
-  const listD=gi('redis-destinos-list');
-  if(!listO||!listD)return;
-
-  listO.innerHTML=exc.length?exc.map(s=>`
-    <div class="srv-check-item" id="ori-${s.id}" onclick="toggleRedisOri(${s.id})">
-      <input type="checkbox" id="chk-ori-${s.id}" onclick="event.stopPropagation();toggleRedisOri(${s.id})">
-      <div style="flex:1">
-        <div class="srv-check-label">${s.servidor}</div>
-        <div class="srv-check-meta">Excedente: <span style="color:#A78BFA">+${Math.abs(s.sg)}</span> | Livres: ${s.l}</div>
-      </div>
-    </div>`).join(''):
-    `<div class="empty" style="padding:16px">Nenhum servidor com excedente</div>`;
-
-  listD.innerHTML=def.length?def.map(s=>`
-    <div class="srv-check-item" id="dst-${s.id}" onclick="toggleRedisDst(${s.id})">
-      <input type="checkbox" id="chk-dst-${s.id}" onclick="event.stopPropagation();toggleRedisDst(${s.id})">
-      <div style="flex:1">
-        <div class="srv-check-label">${s.servidor}</div>
-        <div class="srv-check-meta">Déficit: <span style="color:#F87171">-${s.sg}</span> | Util: ${s.p}%</div>
-      </div>
-    </div>`).join(''):
-    `<div class="empty" style="padding:16px">Nenhum servidor com déficit</div>`;
-
-  const qtdEl=gi('redis-qtd-total');if(qtdEl)qtdEl.value='';
+  _redisOri=new Set(); _redisDst=new Set();
+  const qtdEl=gi('redis-qtd-total'); if(qtdEl)qtdEl.value='';
+  const dupEl=gi('redis-allow-dup'); if(dupEl)dupEl.checked=false;
   gi('redis-preview').style.display='none';
   gi('redis-empty').style.display='block';
-  const sb=gi('redis-save-btn');if(sb)sb.style.display='none';
-  updateRedisTotals();
+  const sb=gi('redis-save-btn'); if(sb)sb.style.display='none';
+
+  // todos os servidores aparecem nos dois lados
+  const sorted=[...d].sort((a,b)=>a.servidor.localeCompare(b.servidor,'pt-BR'));
+
+  function itemHTML(s, lado){
+    const pc=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
+    const info=lado==='ori'
+      ? `Livres: <strong style="color:#A78BFA">${s.l}</strong> | Excedente: <strong style="color:${s.sg<0?'#34D399':'#F87171'}">${s.sg<0?'+'+Math.abs(s.sg):'−'+s.sg}</strong>`
+      : `Déficit: <strong style="color:${s.sg>0?'#F87171':'#34D399'}">${s.sg>0?'−'+s.sg:'nenhum'}</strong> | Uso: <strong style="color:${pc}">${s.p}%</strong>`;
+    return`<div id="${lado}-item-${s.id}"
+      onclick="toggleRedis('${lado}',${s.id})"
+      style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;border:1px solid var(--b1);background:var(--s2);cursor:pointer;transition:all 0.15s;user-select:none">
+      <div style="width:14px;height:14px;border-radius:4px;border:1.5px solid var(--b2);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.15s" id="${lado}-chk-${s.id}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600;color:var(--t1);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.servidor}</div>
+        <div style="font-size:10px;font-family:var(--mono);color:var(--t3);margin-top:2px">${info}</div>
+      </div>
+      <div style="width:4px;height:28px;border-radius:2px;background:${pc};flex-shrink:0;opacity:0.6"></div>
+    </div>`;
+  }
+
+  const oriList=gi('redis-ori-list');
+  const dstList=gi('redis-dst-list');
+  if(oriList) oriList.innerHTML=sorted.map(s=>itemHTML(s,'ori')).join('');
+  if(dstList) dstList.innerHTML=sorted.map(s=>itemHTML(s,'dst')).join('');
+  updateRedisCounts();
 }
 
-function toggleRedisOri(id){
-  if(_redisOrigens.has(id))_redisOrigens.delete(id);
-  else _redisOrigens.add(id);
-  const el=gi('ori-'+id);const chk=gi('chk-ori-'+id);
-  if(el)el.classList.toggle('selected',_redisOrigens.has(id));
-  if(chk)chk.checked=_redisOrigens.has(id);
-  updateRedisTotals();calcRedisMulti();
+function toggleRedis(lado,id){
+  const set=lado==='ori'?_redisOri:_redisDst;
+  if(set.has(id))set.delete(id); else set.add(id);
+  const item=gi(`${lado}-item-${id}`);
+  const chk=gi(`${lado}-chk-${id}`);
+  const ativo=set.has(id);
+  if(item){
+    item.style.borderColor=ativo?(lado==='ori'?'rgba(99,102,241,0.6)':'rgba(16,185,129,0.6)'):'var(--b1)';
+    item.style.background=ativo?(lado==='ori'?'rgba(79,70,229,0.12)':'rgba(16,185,129,0.08)'):'var(--s2)';
+  }
+  if(chk){
+    chk.style.background=ativo?(lado==='ori'?'var(--in2)':'var(--gr2)'):'transparent';
+    chk.style.borderColor=ativo?(lado==='ori'?'var(--in2)':'var(--gr2)'):'var(--b2)';
+    chk.textContent=ativo?'✓':'';
+    chk.style.color='#fff';
+  }
+  updateRedisCounts();
+  calcRedisMulti();
 }
-function toggleRedisDst(id){
-  if(_redisDestinos.has(id))_redisDestinos.delete(id);
-  else _redisDestinos.add(id);
-  const el=gi('dst-'+id);const chk=gi('chk-dst-'+id);
-  if(el)el.classList.toggle('selected',_redisDestinos.has(id));
-  if(chk)chk.checked=_redisDestinos.has(id);
-  updateRedisTotals();calcRedisMulti();
+
+function updateRedisCounts(){
+  const oc=gi('redis-ori-count'), dc=gi('redis-dst-count');
+  if(oc){oc.textContent=_redisOri.size+' selecionado'+(+_redisOri.size!==1?'s':'');oc.style.display=_redisOri.size?'inline':'none';}
+  if(dc){dc.textContent=_redisDst.size+' selecionado'+(+_redisDst.size!==1?'s':'');dc.style.display=_redisDst.size?'inline':'none';}
 }
-function updateRedisTotals(){
-  const d=getDv();
-  const excTotal=Array.from(_redisOrigens).reduce((a,id)=>{const s=d.find(x=>x.id===id);return a+(s?Math.abs(s.sg):0);},0);
-  const defTotal=Array.from(_redisDestinos).reduce((a,id)=>{const s=d.find(x=>x.id===id);return a+(s?s.sg:0);},0);
-  const excEl=gi('redis-exc-total');if(excEl)excEl.textContent=excTotal;
-  const defEl=gi('redis-def-total');if(defEl)defEl.textContent=defTotal;
-}
+
 function calcRedisMulti(){
   const d=getDv();
   const qtd=+gi('redis-qtd-total').value||0;
   const allowDup=gi('redis-allow-dup')&&gi('redis-allow-dup').checked;
 
-  if(!_redisOrigens.size||!_redisDestinos.size||qtd<=0){
+  if(!_redisOri.size||!_redisDst.size||!qtd){
     gi('redis-preview').style.display='none';
     gi('redis-empty').style.display='block';
     const sb=gi('redis-save-btn');if(sb)sb.style.display='none';
     return;
   }
 
-  const origens=Array.from(_redisOrigens).map(id=>d.find(s=>s.id===id)).filter(Boolean);
-  const destinos=Array.from(_redisDestinos).map(id=>d.find(s=>s.id===id)).filter(Boolean);
+  const origens=Array.from(_redisOri).map(id=>d.find(s=>s.id===id)).filter(Boolean);
+  const destinos=Array.from(_redisDst).map(id=>d.find(s=>s.id===id)).filter(Boolean);
 
-  // Distribuição proporcional ao déficit
-  const defTotal=destinos.reduce((a,s)=>a+s.sg,0)||1;
-  let restante=qtd;
+  // Distribui igualmente entre origens (tirar de cada)
+  const porOri=Math.floor(qtd/origens.length);
+  const remOri=qtd%origens.length;
+  const planOrigens=origens.map((s,i)=>{
+    const dado=porOri+(i<remOri?1:0);
+    return{...s,dado,nq:s.qtd-dado};
+  });
+
+  // Distribui proporcionalmente ao déficit entre destinos
+  const defTotal=destinos.reduce((a,s)=>a+Math.max(s.sg,1),0)||destinos.length;
+  let restDst=qtd;
   const planDestinos=destinos.map((s,i)=>{
-    const proporcao=s.sg/defTotal;
-    const rec=i===destinos.length-1?restante:Math.round(proporcao*qtd);
-    restante-=rec;
+    const prop=Math.max(s.sg,1)/defTotal;
+    const rec=i===destinos.length-1?restDst:Math.round(prop*qtd);
+    restDst-=rec;
     return{...s,rec:Math.max(0,rec),nq:s.qtd+Math.max(0,rec)};
   });
 
-  // Distribuição das origens: proporcionalmente ao excedente ou igualmente
-  const excTotal=origens.reduce((a,s)=>a+Math.abs(s.sg),0)||1;
-  let restOri=qtd;
-  const planOrigens=origens.map((s,i)=>{
-    const proporcao=Math.abs(s.sg)/excTotal;
-    const dado=i===origens.length-1?restOri:Math.round(proporcao*qtd);
-    restOri-=dado;
-    return{...s,dado:Math.max(0,dado),nq:s.qtd-Math.max(0,dado)};
-  });
-
-  // Verificação: checar se origems têm suficiente
-  const alertas=planOrigens.filter(s=>s.dado>s.l);
-
   gi('redis-preview').style.display='block';
   gi('redis-empty').style.display='none';
-  const sb=gi('redis-save-btn');if(sb)sb.style.display='block';
+  const sb=gi('redis-save-btn');if(sb)sb.style.display='inline';
 
-  const colOri=planOrigens.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';return`<tr><td class="b">📤 ${s.servidor}</td><td class="m" style="color:#A78BFA">${s.qtd}</td><td class="m" style="color:#F87171">−${s.dado}</td><td class="m" style="color:var(--in3)">${s.nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;}).join('');
-  const colDst=planDestinos.map(s=>{const np=s.qtd>0?Math.round(s.util/s.nq*100):0;const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';return`<tr><td class="b">📥 ${s.servidor}</td><td class="m" style="color:#A78BFA">${s.qtd}</td><td class="m" style="color:#34D399">+${s.rec}</td><td class="m" style="color:var(--in3)">${s.nq}</td><td class="m" style="color:${cA}">${s.p}%</td><td class="m" style="color:${cD}">${np}%</td></tr>`;}).join('');
+  const resumoEl=gi('redis-resumo');
+  if(resumoEl)resumoEl.textContent=`${qtd} lic. | ${origens.length} origem(ns) → ${destinos.length} destino(s)${allowDup?' | duplicação ativada':''}`;
 
-  const alertaHtml=alertas.length>0?`<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#F87171;margin-bottom:10px">⚠ Atenção: ${alertas.map(s=>`${s.servidor} dará ${s.dado} mas só tem ${s.l} livres`).join(' | ')}${allowDup?' — duplicação ativada':''}</div>`:'';
-  const dupInfo=allowDup?`<div style="margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--am3);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 12px">✓ Duplicação permitida — uma mesma licença pode ser enviada a múltiplos destinos</div>`:'';
+  const tbody=gi('redis-result-body');
+  if(tbody){
+    const rows=[
+      ...planOrigens.map(s=>{
+        const np=s.nq>0?Math.round(s.util/s.nq*100):0;
+        const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
+        const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';
+        const warn=!allowDup&&s.dado>s.l?` <span style="color:#F87171;font-size:10px">⚠ insuf.</span>`:'';
+        return`<tr>
+          <td class="b"><span style="color:var(--re3)">📤</span> ${s.servidor}${warn}</td>
+          <td class="m">${s.qtd}</td>
+          <td class="m" style="color:#F87171">− ${s.dado}</td>
+          <td class="m" style="color:var(--in3)">${s.nq}</td>
+          <td class="m" style="color:${cA}">${s.p}%</td>
+          <td class="m" style="color:${cD}">${np}%</td>
+        </tr>`;
+      }),
+      ...planDestinos.map(s=>{
+        const np=s.nq>0?Math.round(s.util/s.nq*100):0;
+        const cA=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
+        const cD=np>=90?'#EF4444':np>=70?'#F59E0B':'#10B981';
+        return`<tr>
+          <td class="b"><span style="color:var(--gr3)">📥</span> ${s.servidor}</td>
+          <td class="m">${s.qtd}</td>
+          <td class="m" style="color:#34D399">+ ${s.rec}</td>
+          <td class="m" style="color:var(--in3)">${s.nq}</td>
+          <td class="m" style="color:${cA}">${s.p}%</td>
+          <td class="m" style="color:${cD}">${np}%</td>
+        </tr>`;
+      })
+    ];
+    tbody.innerHTML=rows.join('');
+  }
 
-  gi('redis-plan-table').innerHTML=alertaHtml+dupInfo+`
-    <div class="tw"><table style="min-width:500px">
-      <thead><tr><th>Servidor</th><th>Antes</th><th>Movimento</th><th>Depois</th><th>Uso Antes</th><th>Uso Depois</th></tr></thead>
-      <tbody>${colOri}${colDst}</tbody>
-    </table></div>
-    <div style="margin-top:10px;display:flex;gap:10px;font-size:11px;font-family:var(--mono)">
-      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Total movendo: <strong style="color:var(--in3)">${qtd} lic.</strong></span>
-      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Origens: <strong style="color:#F87171">${planOrigens.length}</strong></span>
-      <span style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--t2)">Destinos: <strong style="color:#34D399">${planDestinos.length}</strong></span>
-    </div>`;
-
-  // Guardar plano para salvar
   window._redisPlanOrigens=planOrigens;
   window._redisPlanDestinos=planDestinos;
   window._redisAllowDup=allowDup;
@@ -938,48 +958,43 @@ function calcRedisMulti(){
 function resetRedis(){initRedisMulti();}
 
 async function applyRedis(){
-  const planO=window._redisPlanOrigens||[];const planD=window._redisPlanDestinos||[];
+  const planO=window._redisPlanOrigens||[];
+  const planD=window._redisPlanDestinos||[];
   if(!planO.length&&!planD.length){toast('⚠ Nenhum plano para salvar.','warn');return;}
-  const allowDup=window._redisAllowDup;
   const qtd=+gi('redis-qtd-total').value||0;
-
-  if(!allowDup){
-    const excTotal=planO.reduce((a,s)=>a+s.l,0);
-    if(qtd>excTotal&&!confirm(`Quantidade (${qtd}) maior que o excedente disponível (${excTotal}). Continuar mesmo assim?`))return;
-  }
-  if(!confirm(`Aplicar redistribuição de ${qtd} licenças entre ${planO.length} origem(ns) e ${planD.length} destino(s)?`))return;
-
-  showLoading('Aplicando redistribuição...');
+  if(!confirm(`Aplicar redistribuição de ${qtd} licenças?`))return;
+  showLoading('Salvando...');
   const detalhes=[];
   try{
     for(const s of planO){
       await sbPatch('servidores',s.id,{qtd:s.nq});
       const idx=S.findIndex(x=>x.id===s.id);if(idx>=0)S[idx]={...S[idx],qtd:s.nq};
-      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq} (−${s.dado})`);
+      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq}`);
     }
     for(const s of planD){
       await sbPatch('servidores',s.id,{qtd:s.nq});
       const idx=S.findIndex(x=>x.id===s.id);if(idx>=0)S[idx]={...S[idx],qtd:s.nq};
-      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq} (+${s.rec})`);
+      detalhes.push(`${s.servidor}: ${s.qtd}→${s.nq}`);
     }
     sortS();invDv();badge();
-    addAudit('Redistribuição de Licenças',detalhes.join(' | ')+(allowDup?' [duplicação]':''),'upd');
-    toast(`✓ Redistribuição de ${qtd} lic. salva!`,'ok');
+    addAudit('Redistribuição de Licenças',detalhes.join(' | ')+(window._redisAllowDup?' [dup]':''),'upd');
+    toast(`✓ Redistribuição salva!`,'ok');
     initRedisMulti();rDash();
   }catch(err){toast('⚠ '+err.message,'error');}
   finally{hideLoading();}
 }
 
 function exportRedis(){
-  const planO=window._redisPlanOrigens||[];const planD=window._redisPlanDestinos||[];
+  const planO=window._redisPlanOrigens||[];
+  const planD=window._redisPlanDestinos||[];
   if(!planO.length&&!planD.length){toast('⚠ Simule primeiro.','warn');return;}
   const now=new Date();
-  const rows=[['Redistribuição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],[''],
-    ['Servidor','Tipo','Lic. Antes','Mov.','Lic. Depois','Uso % Antes','Uso % Depois'],
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Redistribuição — SRV Monitor'],['Gerado: '+now.toLocaleString('pt-BR')],[''],
+    ['Servidor','Tipo','Antes','Movimento','Depois','Uso Antes','Uso Depois'],
     ...planO.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;return[s.servidor,'Origem',s.qtd,-s.dado,s.nq,s.p+'%',np+'%'];}),
     ...planD.map(s=>{const np=s.nq>0?Math.round(s.util/s.nq*100):0;return[s.servidor,'Destino',s.qtd,+s.rec,s.nq,s.p+'%',np+'%'];}),
-  ];
-  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Redistribuição');
   XLSX.writeFile(wb,`redistribuicao-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`);
   toast('✓ Exportado!','ok');
