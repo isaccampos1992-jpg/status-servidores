@@ -283,7 +283,6 @@ td.m{font-family:var(--mono);font-size:11px}
       <div class="ni a" onclick="go('dashboard',this)"><span class="nic">◈</span>Dashboard</div>
       <div class="ns">Gestão</div>
       <div class="ni" onclick="go('servidores',this)"><span class="nic">⬡</span>Servidores</div>
-      <div class="ni" onclick="go('licencas',this)"><span class="nic">◉</span>Licenças</div>
       <div class="ns">Análise</div>
       <div class="ni" onclick="go('projecoes',this)"><span class="nic">↑</span>Projeções<span class="nbadge" id="nbp">0</span></div>
       <div class="ni" onclick="go('relatorios',this)"><span class="nic">▲</span>Relatórios</div>
@@ -350,33 +349,132 @@ td.m{font-family:var(--mono);font-size:11px}
         </div>
       </div>
 
-      <!-- SERVIDORES -->
+      <!-- SERVIDORES (unificado com licenças) -->
       <div class="panel" id="p-servidores">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <div class="stitle" style="margin-bottom:0">Todos os Servidores</div>
-          <button class="btn bp" onclick="openAdd()">+ Novo Servidor</button>
+          <div>
+            <div class="sec-title">Servidores & Licenças</div>
+            <div class="sec-sub">visão unificada — clique em um card para detalhes</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="tabs" style="margin-bottom:0">
+              <div class="tab a" id="srv-tab-cards" onclick="srvView('cards',this)">⊞ Cards</div>
+              <div class="tab" id="srv-tab-table" onclick="srvView('table',this)">≡ Tabela</div>
+            </div>
+            <button class="btn bp" onclick="openAdd()">+ Novo Servidor</button>
+          </div>
         </div>
+        <!-- Filtro grupo -->
+        <div style="display:flex;gap:6px;margin-bottom:14px" id="srv-filters">
+          <button class="btn bp" onclick="fSrv('total',this)">Total</button>
+          <button class="btn bg" onclick="fSrv('sigma gear',this)">Sigma Gear</button>
+          <button class="btn bg" onclick="fSrv('sigma imagem',this)">Sigma Imagem</button>
+        </div>
+        <!-- Cards view -->
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px" id="srv-cards"></div>
-      </div>
-
-      <!-- LICENÇAS -->
-      <div class="panel" id="p-licencas">
-        <div class="stitle">Gestão de Licenças</div>
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px" id="lic-cards"></div>
+        <!-- Table view -->
+        <div id="srv-table" style="display:none">
+          <div class="tc">
+            <div class="tw"><table><thead><tr><th>Servidor</th><th>Licenças</th><th>Utilizadas</th><th>Livres</th><th>Ideal</th><th>Excedente</th><th>Câmeras</th><th>Câm. I.A</th><th>Uso %</th><th>Status</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>
+          </div>
+        </div>
       </div>
 
       <!-- PROJEÇÕES -->
       <div class="panel" id="p-projecoes">
-        <div class="stitle">Projeção Automática de Licenças</div>
-        <div style="display:flex;gap:6px;margin-bottom:14px" id="exceed-filters">
-          <button class="btn bp" onclick="fExceed('total',this)">Total</button>
-          <button class="btn bg" onclick="fExceed('sigma gear',this)">Sigma Gear</button>
-          <button class="btn bg" onclick="fExceed('sigma imagem',this)">Sigma Imagem</button>
+        <div class="tabs" id="proj-tabs">
+          <div class="tab a" onclick="projTab('cenario',this)">📊 Cenário Atual</div>
+          <div class="tab" onclick="projTab('redistribuir',this)">🔄 Redistribuição</div>
+          <div class="tab" onclick="projTab('aquisicao',this)">🛒 Aquisição</div>
+          <div class="tab" onclick="projTab('historico',this)">📋 Histórico</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px" id="proj-dash"></div>
-        <div class="pjg" id="pjg"></div>
-        <div class="tc"><div class="th2"><div class="tt">Sumário Executivo</div></div>
-        <div class="tw"><table><thead><tr><th>Servidor</th><th>Atual</th><th>Ideal</th><th>Utilização</th><th>Sugestão</th><th>Prioridade</th></tr></thead><tbody id="ptb"></tbody></table></div></div>
+
+        <!-- CENÁRIO ATUAL -->
+        <div class="tsec a" id="proj-cenario">
+          <div style="display:flex;gap:6px;margin-bottom:14px" id="exceed-filters">
+            <button class="btn bp" onclick="fExceed('total',this)">Total</button>
+            <button class="btn bg" onclick="fExceed('sigma gear',this)">Sigma Gear</button>
+            <button class="btn bg" onclick="fExceed('sigma imagem',this)">Sigma Imagem</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px" id="proj-dash"></div>
+          <div class="pjg" id="pjg"></div>
+        </div>
+
+        <!-- REDISTRIBUIÇÃO -->
+        <div class="tsec" id="proj-redistribuir">
+          <div class="sec-hdr">
+            <div><div class="sec-title">Simulador de Redistribuição</div><div class="sec-sub">mova licenças entre servidores e veja o impacto antes de aplicar</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:16px">
+            <div class="cc">
+              <div class="cct" style="margin-bottom:12px">📤 Origem (excedente)</div>
+              <select class="fi" id="redis-origem" style="width:100%;margin-bottom:10px" onchange="calcRedis()"><option value="">Selecione o servidor origem...</option></select>
+              <div id="redis-origem-info"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:40px">
+              <div style="font-size:24px">→</div>
+              <div>
+                <label style="font-size:10px;color:var(--t3);font-family:var(--mono);display:block;margin-bottom:5px">Qtd. a mover</label>
+                <input type="number" id="redis-qtd" class="fi" style="width:90px;text-align:center" placeholder="0" min="1" oninput="calcRedis()">
+              </div>
+            </div>
+            <div class="cc">
+              <div class="cct" style="margin-bottom:12px">📥 Destino (déficit)</div>
+              <select class="fi" id="redis-destino" style="width:100%;margin-bottom:10px" onchange="calcRedis()"><option value="">Selecione o servidor destino...</option></select>
+              <div id="redis-destino-info"></div>
+            </div>
+          </div>
+          <div id="redis-preview" style="display:none">
+            <div class="cc" style="margin-bottom:12px">
+              <div class="cct" style="margin-bottom:14px">📊 Antes × Depois</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="redis-before-after"></div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:10px">
+              <button class="btn bg" onclick="resetRedis()">✕ Limpar</button>
+              <button class="btn bp" onclick="exportRedis()">↓ Exportar Cenário</button>
+            </div>
+          </div>
+          <div id="redis-empty" style="text-align:center;padding:32px;color:var(--t3);font-family:var(--mono);font-size:12px">Selecione origem, destino e quantidade para simular</div>
+        </div>
+
+        <!-- AQUISIÇÃO -->
+        <div class="tsec" id="proj-aquisicao">
+          <div class="sec-hdr">
+            <div><div class="sec-title">Simulador de Aquisição</div><div class="sec-sub">simule a compra de licenças e veja a distribuição ideal automática</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+            <div class="cc">
+              <div class="cct" style="margin-bottom:10px">Licenças a Adquirir</div>
+              <input type="number" id="acq-qtd" class="fi" style="width:100%" placeholder="Ex: 100" min="1" oninput="calcAcq()">
+            </div>
+            <div class="cc">
+              <div class="cct" style="margin-bottom:10px">Valor por Licença (R$)</div>
+              <input type="number" id="acq-preco" class="fi" style="width:100%" placeholder="Ex: 50,00" min="0" step="0.01" oninput="calcAcq()">
+            </div>
+            <div class="cc">
+              <div class="cct" style="margin-bottom:10px">Priorizar grupo</div>
+              <select id="acq-grupo" class="fi" style="width:100%" onchange="calcAcq()">
+                <option value="total">Todos os servidores</option>
+                <option value="sigma imagem">Sigma Imagem</option>
+                <option value="sigma gear">Sigma Gear</option>
+              </select>
+            </div>
+          </div>
+          <div id="acq-result"></div>
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div class="tsec" id="proj-historico">
+          <div class="sec-hdr">
+            <div><div class="sec-title">Cenários Salvos</div><div class="sec-sub">histórico de simulações para aprovação e referência</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bs" onclick="saveSnapshot()">📸 Salvar Snapshot Atual</button>
+              <button class="btn bg" onclick="clearSnapshots()">🗑 Limpar</button>
+              <button class="btn bp" onclick="exportRelXlsx()">↓ Exportar</button>
+            </div>
+          </div>
+          <div id="proj-hist-content"></div>
+        </div>
       </div>
 
       <!-- IMPORTAR -->
@@ -630,7 +728,6 @@ function go(id,el){
   // renderiza apenas o painel ativo
   if(id==='dashboard')rDash();
   else if(id==='servidores')rSrv();
-  else if(id==='licencas')rLic();
   else if(id==='projecoes')rProj();
   else if(id==='relatorios')rRel();
   else if(id==='configuracoes'){rCfgInfo();renderUsersGrid();}
