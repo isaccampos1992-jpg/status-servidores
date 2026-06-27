@@ -728,7 +728,7 @@ function go(id,el){
   // renderiza apenas o painel ativo
   if(id==='dashboard')rDash();
   else if(id==='servidores')rSrv();
-  else if(id==='projecoes')rProj();
+  else if(id==='projecoes'){rProjCenario();}
   else if(id==='relatorios')rRel();
   else if(id==='configuracoes'){rCfgInfo();renderUsersGrid();}
 }
