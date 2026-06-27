@@ -352,16 +352,17 @@ td.m{font-family:var(--mono);font-size:11px}
 
       <!-- SERVIDORES -->
       <div class="panel" id="p-servidores">
-        <div class="tc">
-          <div class="th2"><div class="tt">Todos os Servidores</div><button class="btn bp" onclick="openAdd()">+ Novo</button></div>
-          <div class="tw"><table><thead><tr><th>Servidor</th><th>Licenças</th><th>Utilizadas</th><th>Livres</th><th>Ideal</th><th>Câmeras</th><th>Câm. I.A</th><th>Uso %</th><th>Status</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="stitle" style="margin-bottom:0">Todos os Servidores</div>
+          <button class="btn bp" onclick="openAdd()">+ Novo Servidor</button>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px" id="srv-cards"></div>
       </div>
 
       <!-- LICENÇAS -->
       <div class="panel" id="p-licencas">
-        <div class="tc"><div class="th2"><div class="tt">Gestão de Licenças</div></div>
-        <div class="tw"><table><thead><tr><th>Servidor</th><th>Total</th><th>Utilizadas</th><th>Livres</th><th>Ideal</th><th>Excedente</th><th>Sugestão</th><th>Status</th></tr></thead><tbody id="ltb"></tbody></table></div></div>
+        <div class="stitle">Gestão de Licenças</div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px" id="lic-cards"></div>
       </div>
 
       <!-- PROJEÇÕES -->
@@ -717,24 +718,52 @@ function rDash(){
     <div class="ll-row" style="background:rgba(79,70,229,0.07);border:1px solid rgba(79,70,229,0.15)"><span style="font-size:11px;color:var(--t2);font-family:var(--mono)">Sigma Gear</span><span style="font-size:17px;font-weight:700;color:#818CF8;font-family:var(--mono)">${lG.toLocaleString('pt-BR')}</span></div>`;
 }
 
-// ═══ SERVIDORES ═══
+// ═══ SERVIDORES — CARDS ═══
 function rSrv(f=''){
   const d=getDv().filter(s=>!f||s.servidor.toLowerCase().includes(f.toLowerCase()));
-  gi('stb').innerHTML=d.map(s=>`<tr onclick="openDetail(${s.id})">
-    <td class="b">${s.servidor}</td><td class="m">${s.qtd}</td><td class="m">${s.util}</td>
-    <td class="m" style="color:${s.l<=s.qtd*0.1?'#EF4444':s.l<=s.qtd*0.2?'#F59E0B':'#34D399'}">${s.l}</td>
-    <td class="m">${s.ideal}</td><td class="m">${s.cam}</td><td class="m" style="color:#A78BFA">${s.caia}</td>
-    <td>${pb(s.p)}</td><td>${sbadge(s.st)}</td>
-    <td onclick="event.stopPropagation()"><div class="ar"><button class="ib" onclick="openEdit(${s.id})">✎</button><button class="ib dl" onclick="del(${s.id})">✕</button></div></td>
-  </tr>`).join('')||`<tr><td colspan="10" class="empty">Nenhum servidor encontrado.</td></tr>`;
+  gi('srv-cards').innerHTML=d.map(s=>{
+    const pc=s.p>=90?'#EF4444':s.p>=70?'#F59E0B':'#10B981';
+    const ic=s.p>=90?'🔴':s.p>=70?'🟡':'🟢';
+    const msgCl=s.sg>0?'pje':s.sg<0?'pjw':'pjo';
+    const msg=s.sg>0?`Solicitar +${s.sg} licenças`:s.sg<0?`Excedente de ${Math.abs(s.sg)}`:'Capacidade ideal';
+    return`<div class="pjc" onclick="openDetail(${s.id})" style="cursor:pointer">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="pjt" style="margin-bottom:0">${ic} ${s.servidor}</div>
+        <div class="ar" onclick="event.stopPropagation()">
+          <button class="ib" onclick="openEdit(${s.id})">✎</button>
+          <button class="ib dl" onclick="del(${s.id})">✕</button>
+        </div>
+      </div>
+      <div class="pjr"><span class="pjk">Licenças</span><span class="pjv">${s.qtd}</span></div>
+      <div class="pjr"><span class="pjk">Utilizadas</span><span class="pjv" style="color:${pc}">${s.util} (${s.p}%)</span></div>
+      <div class="pjr"><span class="pjk">Livres</span><span class="pjv" style="color:${s.l<=s.qtd*0.1?'#EF4444':s.l<=s.qtd*0.2?'#F59E0B':'#34D399'}">${s.l}</span></div>
+      <div class="pjr"><span class="pjk">Ideal</span><span class="pjv">${s.ideal}</span></div>
+      <div class="pjr"><span class="pjk">Câmeras / I.A</span><span class="pjv">${s.cam} / <span style="color:#A78BFA">${s.caia}</span></span></div>
+      <div style="height:4px;background:var(--s4);border-radius:2px;overflow:hidden;margin-top:10px">
+        <div style="height:100%;width:${Math.min(s.p,100)}%;background:${pc};border-radius:2px;transition:width 0.4s ease"></div>
+      </div>
+      <div class="pjs ${msgCl}" style="margin-top:8px">${msg}</div>
+    </div>`;
+  }).join('')||`<div style="grid-column:1/-1" class="empty">Nenhum servidor encontrado.</div>`;
 }
 
-// ═══ LICENÇAS ═══
+// ═══ LICENÇAS — CARDS ═══
 function rLic(){
-  gi('ltb').innerHTML=getDv().map(s=>{
-    let sc='bgg',st='Ideal';if(s.sg>0){sc='bgr';st=`+${s.sg} lic`;}if(s.sg<0){sc='bgy';st=`Exc. ${Math.abs(s.sg)}`;}
-    return`<tr onclick="openDetail(${s.id})"><td class="b">${s.servidor}</td><td class="m">${s.qtd}</td><td class="m">${s.util}</td><td class="m" style="color:${s.l<=5?'#EF4444':'#34D399'}">${s.l}</td><td class="m">${s.ideal}</td><td class="m" style="color:${s.e<0?'#EF4444':s.e===0?'#34D399':'#F59E0B'}">${s.e>0?'+':''}${s.e}</td><td><span class="badge ${sc}">${st}</span></td><td>${sbadge(s.st)}</td></tr>`;
-  }).join('')||`<tr><td colspan="8" class="empty">Nenhum dado.</td></tr>`;
+  gi('lic-cards').innerHTML=getDv().map(s=>{
+    const msgCl=s.sg>0?'pje':s.sg<0?'pjw':'pjo';
+    const msg=s.sg>0?`Solicitar +${s.sg} licenças`:s.sg<0?`Excedente de ${Math.abs(s.sg)}`:'Capacidade ideal';
+    const ic=s.sg>0?'🔴':s.sg<0?'🟡':'🟢';
+    const pLivres=s.qtd>0?Math.round(s.l/s.qtd*100):0;
+    return`<div class="pjc" onclick="openDetail(${s.id})" style="cursor:pointer">
+      <div class="pjt" style="margin-bottom:12px">${ic} ${s.servidor}</div>
+      <div class="pjr"><span class="pjk">Total de Licenças</span><span class="pjv">${s.qtd}</span></div>
+      <div class="pjr"><span class="pjk">Utilizadas</span><span class="pjv">${s.util}</span></div>
+      <div class="pjr"><span class="pjk">Livres</span><span class="pjv" style="color:${s.l<=5?'#EF4444':'#34D399'}">${s.l} (${pLivres}%)</span></div>
+      <div class="pjr"><span class="pjk">Ideal</span><span class="pjv">${s.ideal}</span></div>
+      <div class="pjr"><span class="pjk">Excedente</span><span class="pjv" style="color:${s.e<0?'#EF4444':s.e===0?'#34D399':'#F59E0B'}">${s.e>0?'+':''}${s.e}</span></div>
+      <div class="pjs ${msgCl}" style="margin-top:10px">${msg}</div>
+    </div>`;
+  }).join('')||`<div class="empty">Nenhum dado.</div>`;
 }
 
 // ═══ PROJEÇÕES ═══
